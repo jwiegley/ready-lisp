@@ -1,3 +1,6 @@
-.DS_Store
 *.elc
+.DS_Store
+/aquamacs
 /build
+/out
+/systems
