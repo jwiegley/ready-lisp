@@ -1,0 +1,6 @@
+[submodule "sbcl"]
+	path = sbcl
+	url = sbcl
+[submodule "slime"]
+	path = slime
+	url = slime

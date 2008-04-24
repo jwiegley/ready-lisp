@@ -1,0 +1,44 @@
+Welcome to Ready Lisp!
+
+The intention of this project to provide a fulling working Lisp environment
+that's only a double-click away for Mac OS X users.
+
+This package includes the following code items:
+
+ - Aquamacs 1.2a
+ - SBCL (Steel Bank Common Lisp) 1.0.12
+ - SLIME (Superior Lisp Interaction Mode for Emacs) CVS 2007-12-06
+ - paredit.el
+ - redshank.el
+ - cldoc.el
+
+It also includes the following documentation, all integrated with the Info
+system (just press `C-h i' within Emacs to view them):
+
+ - ANSI Common Lisp HyperSpec
+ - SLIME documentation
+ - ASDF documentation
+ - SBCL user's manual
+
+There are also HTML versions of all documentation, and PDF versions of most
+documentation, available in these two locations:
+
+  Ready Lisp.app/Contents/Resources/html
+  Ready Lisp.app/Contents/Resources/pdf
+
+Everthing has been pre-configured for you to enable all options and turn on
+all modes.  If you wish to configure things, edit this file:
+
+  Ready Lisp.app/Contents/Resources/site-lisp/init.lisp.el
+
+
+NOTE to Intel users: Experimental threading has been enabled in this version
+of Ready Lisp.  Also it is entirely universal, meaning it runs on PowerPC as
+well as 64-bit and 32-bit Intel machines.  If you want to force it to run at
+32-bit on a 64-bit machine (I find the debugging is nicer with the 32-bit
+version), edit the init-lisp.el file mentioned about and change the value of
+the variable `slime-use-intel-x86-64' from "t" to "nil".  Then type
+`M-x byte-compile-file' to recompile init-lisp.el, and restart Ready Lisp.
+
+Happy Lisping,
+  John Wiegley @ http://www.newartisans.com
