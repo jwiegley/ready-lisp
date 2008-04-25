@@ -39,9 +39,7 @@ update:
 
 ######################################################################
 
-dependencies: aquamacs sbcl-git slime-git hyperspec \
-	cl-fad cl-ppcre local-time series systems
-	@echo Dependencies are up-to-date.
+dependencies: aquamacs sbcl-git slime-git hyperspec cl-fad cl-ppcre local-time series systems
 
 ######################################################################
 
@@ -245,7 +243,7 @@ systems:
 
 ######################################################################
 
-site-lisp-elc: site-lisp/cldoc.el site-lisp/paredit.el site-lisp/redshank.el
+site-lisp/paredit.elc: site-lisp/cldoc.el site-lisp/paredit.el site-lisp/redshank.el
 	echo $? | while read file; do \
 	    EMACSDATA="$(RESOURCES)/etc" \
 	    EMACSDOC="$(RESOURCES)/etc" \
@@ -261,6 +259,8 @@ site-lisp-elc: site-lisp/cldoc.el site-lisp/paredit.el site-lisp/redshank.el
 		-batch -f batch-byte-compile $$file; \
 	done
 
+site-lisp-elc: site-lisp/paredit.elc
+
 ######################################################################
 
 HYPERSPEC_TGZ=HyperSpec-7-0.tar.gz
@@ -272,6 +272,7 @@ doc/html/$(HYPERSPEC_TGZ):
 
 doc/html/HyperSpec: doc/html/$(HYPERSPEC_TGZ)
 	(cd doc/html; tar xvzf $(HYPERSPEC_TGZ))
+	touch $@
 
 hyperspec: doc/html/HyperSpec
 
