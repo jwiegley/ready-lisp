@@ -50,9 +50,7 @@ Happy Lisping,
 p.s. If you are interested in building Ready Lisp yourself, the process has
      been made quite simple:
 
-       $ git clone git://newartisans.com/readylisp.git
-       $ cd readylisp
-       $ make
+     git clone git://newartisans.com/readylisp.git && cd readylisp && make
 
      This will take quite some time, but will eventually leave a disk image in
      the "build" subdirectory which matches the current version of Ready Lisp.
