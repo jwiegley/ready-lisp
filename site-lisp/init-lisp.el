@@ -1,3 +1,28 @@
+;;; init-lisp.el --- Code to initialize the Ready Lisp environment
+
+;; Copyright (C) 2007,2008  John Wiegley.  All rights reserved.
+
+;; Author: John Wiegley <johnw@newartisans.com>
+;; Keywords: lisp
+;; location: http://www.newartisans.com/software/readylisp.html
+
+;; This file is not part of GNU Emacs.
+
+;; This module is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published
+;; by the Free Software Foundation; either version 2, or (at your
+;; option) any later version.
+
+;; This module is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
+
 ;;;_ * mule
 
 (prefer-coding-system 'utf-8)
@@ -107,7 +132,7 @@
 
 ;;(setq slime-net-coding-system 'utf-8-unix)
 
-(defvar *slime-use-intel-x86-64* t)
+(defvar *slime-use-intel-x86-64* nil)
 
 (defvar *sbcl-arch*
   (if (string= "i386" (shell-command-to-string "arch"))
@@ -197,8 +222,7 @@
 	 (,@(list "/usr/bin/arch" "-arch" *sbcl-arch*
 		  (expand-file-name "sbcl" *sbcl-home-path*)
 		  "--core"
-		  (expand-file-name (concat "sbcl.core-with-slime-" *sbcl-arch*)
-				    *sbcl-home-path*)))
+		  (expand-file-name "sbcl.core-with-slime" *sbcl-lib-path*)))
 	 :init (lambda (port-file _)
 		 (format "(swank:start-server %S :coding-system \"utf-8-unix\")\n"
 			 port-file))
@@ -240,3 +264,5 @@
 (slime)
 
 (provide 'init-lisp)
+
+;; init-lisp.el ends here
