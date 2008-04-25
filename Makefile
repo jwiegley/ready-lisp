@@ -363,4 +363,4 @@ clean:
 	find slime site-lisp -name '*.elc' -delete
 
 scour: clean
-	rm -fr sbcl slime systems site
+	rm -fr aquamacs sbcl slime systems site
