@@ -1,6 +1,20 @@
-VERSION = $(shell date +%Y%m%d)
+# These are the versions that Ready Lisp is known to work with.  Update at
+# your own risk!  All you have to do is the change the version number here,
+# and the corresponding file will automatically be uploaded from the author's
+# server.  Note that paredit.el and redshank.el must be updated manually.
 
-SBCL_VER = $(shell ./sbcl-ver)
+VERSION	       = $(shell date +%Y%m%d)
+SBCL_VER       = $(shell ./sbcl-ver)
+SLIME_VER      = $(shell ./slime-ver)
+
+AQUA_VER       = 1.3b		# Aqumacs Emacs
+
+CL_FAD_VER     = 0.6.2		# CL-FAD
+CL_PPCRE_VER   = 1.3.2		# CL-PPCRE
+LOCAL_TIME_VER = 0.9.3		# LOCAL-TIME
+SERIES_VER     = 2.2.9		# SERIES
+
+######################################################################
 
 PWD = $(shell pwd)
 
@@ -18,6 +32,11 @@ SBCL_PPC_CORE    = $(SBCL_PPC_LIB)/sbcl.core-with-slime
 
 all: dependencies sbcl slime-build site-lisp-elc disk-image
 
+update:
+	git pull
+	test -d sbcl && (cd sbcl && git pull)
+	test -d slime && (cd slime && git pull)
+
 ######################################################################
 
 dependencies: aquamacs sbcl-git slime-git \
@@ -26,7 +45,6 @@ dependencies: aquamacs sbcl-git slime-git \
 
 ######################################################################
 
-AQUA_VER=1.3b
 AQUA_DMG=Aquamacs-Emacs-$(AQUA_VER).dmg
 AQUA_URL=http://www.tardis.ed.ac.uk/~dreitter/$(AQUA_DMG)
 AQUA_APP=Aquamacs Emacs.app
@@ -162,7 +180,6 @@ slime-build: slime/slime.elc #slime-doc
 ######################################################################
 
 CL_FAD_URL=http://www.weitz.de/cl-fad/
-CL_FAD_VER=0.6.2
 CL_FAD_TGZ=cl-fad.tar.gz
 CL_FAD_TGZ_URL=http://weitz.de/files/$(CL_FAD_TGZ)
 
@@ -178,7 +195,6 @@ cl-fad: site/cl-fad-$(CL_FAD_VER)
 ######################################################################
 
 CL_PPCRE_URL=http://www.weitz.de/cl-ppcre/
-CL_PPCRE_VER=1.3.2
 CL_PPCRE_TGZ=cl-ppcre.tar.gz
 CL_PPCRE_TGZ_URL=http://weitz.de/files/$(CL_PPCRE_TGZ)
 
@@ -194,7 +210,6 @@ cl-ppcre: site/cl-ppcre-$(CL_PPCRE_VER)
 ######################################################################
 
 LOCAL_TIME_URL=http://common-lisp.net/project/local-time/
-LOCAL_TIME_VER=0.9.3
 LOCAL_TIME_TGZ=local-time-$(LOCAL_TIME_VER).tar.gz
 LOCAL_TIME_TGZ_URL=http://common-lisp.net/project/local-time/$(LOCAL_TIME_TGZ)
 
@@ -210,7 +225,6 @@ local-time: site/local-time-$(LOCAL_TIME_VER)
 ######################################################################
 
 SERIES_URL=http://series.sourceforge.net/
-SERIES_VER=2.2.9
 SERIES_TBZ=series-$(SERIES_VER).tar.bz2
 SERIES_TBZ_URL=http://downloads.sourceforge.net/series/$(SERIES_TBZ)
 
