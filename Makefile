@@ -356,10 +356,10 @@ copy-docs:
 	cp -p $(SBCL_I386)/share/info/*.info* "$(APP)"/Contents/Resources/info/
 	patch -p1 -d "$(APP)"/Contents/Resources < doc/info/dir.patch
 	rsync -av $(SBCL_I386)/share/man/ "$(APP)"/Contents/Resources/man/
-	mkdir Ready\ Lisp.app/Contents/Resources/pdf/
+	mkdir "$(APP)"/Contents/Resources/pdf/
 	cp -p $(SBCL_I386)/share/doc/sbcl/*.pdf "$(APP)"/Contents/Resources/pdf/
 	cp -p slime/doc/*.pdf "$(APP)"/Contents/Resources/pdf/
-	mkdir Ready\ Lisp.app/Contents/Resources/html/
+	mkdir "$(APP)"/Contents/Resources/html/
 	rsync -av doc/html/HyperSpec "$(APP)"/Contents/Resources/html
 	rsync -av slime/doc/html/ "$(APP)"/Contents/Resources/html/slime/
 	rsync -av $(SBCL_I386)/share/doc/sbcl/html/asdf \
