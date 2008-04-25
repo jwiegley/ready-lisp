@@ -39,7 +39,8 @@ update:
 
 ######################################################################
 
-dependencies: aquamacs sbcl-git slime-git hyperspec cl-fad cl-ppcre local-time series systems
+dependencies: aquamacs sbcl-git slime-git hyperspec \
+	cl-fad cl-ppcre local-time series systems
 
 ######################################################################
 
