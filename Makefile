@@ -279,7 +279,7 @@ hyperspec: doc/html/HyperSpec
 
 APP=/tmp/Ready Lisp/Ready Lisp.app
 
-disk-image:
+dist/ReadyLisp-$(VERSION).dmg:
 	rm -fr /tmp/Ready\ Lisp
 	mkdir /tmp/Ready\ Lisp
 	mkdir /tmp/Ready\ Lisp/.background
@@ -304,6 +304,8 @@ disk-image:
 	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
 		ReadyLisp-$(VERSION).dmg)
 	mv /tmp/ReadyLisp-$(VERSION).dmg build
+
+dist: dist/ReadyLisp-$(VERSION).dmg
 
 dist2:
 	rm -fr /tmp/Ready\ Lisp
