@@ -7,6 +7,7 @@
 
 (pushnew "systems/" asdf:*central-registry*)
 
+(asdf:operate 'asdf:load-op :cl-fad)
 (asdf:operate 'asdf:load-op :cl-ppcre)
 (asdf:operate 'asdf:load-op :series)
 (asdf:operate 'asdf:load-op :local-time)
