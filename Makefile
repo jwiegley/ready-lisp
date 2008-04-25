@@ -1,4 +1,4 @@
-VERSION = $(date +%Y%m%d)
+VERSION = $(shell date +%Y%m%d)
 
 SBCL_VER = $(shell ./sbcl-ver)
 
@@ -16,7 +16,7 @@ SBCL_I386_CORE   = $(SBCL_I386_LIB)/sbcl.core-with-slime
 SBCL_X86_64_CORE = $(SBCL_X86_64_LIB)/sbcl.core-with-slime
 SBCL_PPC_CORE    = $(SBCL_PPC_LIB)/sbcl.core-with-slime
 
-all: dependencies sbcl slime-elc site-lisp-elc dist
+all: dependencies sbcl slime-build site-lisp-elc dist
 
 ######################################################################
 
@@ -61,6 +61,7 @@ sbcl/version.lisp-expr: sbcl-git
 
 $(SBCL_PPC)/bin/sbcl: sbcl-git
 	(cd sbcl && sh clean.sh && sh make.sh && \
+	 (cd doc && sh make-doc.sh) && \
 	 rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) && \
 	 INSTALL_ROOT=$(SBCL_PPC) sh install.sh)
 
@@ -75,12 +76,13 @@ sbcl-x86_64: $(SBCL_X86_64)/bin/sbcl
 
 $(SBCL_I386)/bin/sbcl: sbcl/version.lisp-expr
 	(cd sbcl && sh clean.sh && sh make.sh && \
+	 (cd doc && sh make-doc.sh) && \
 	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) && \
 	 INSTALL_ROOT=$(SBCL_I386) sh install.sh)
 
 sbcl-i386: $(SBCL_I386)/bin/sbcl
 
-sbcl-bin: sbcl-$(shell uname -p)
+build/sbcl/sbcl: sbcl-$(shell uname -p)
 	if [   -f sbcl-$(SBCL_VER)-ppc.tar.bz2 -a \
 	     ! -d $(SBCL_PPC) ]; then \
 	    tar xvjf sbcl-$(SBCL_VER)-ppc.tar.bz2; \
@@ -130,7 +132,7 @@ sbcl-i386-core: $(SBCL_I386_CORE) sbcl-x86_64-core
 ppc: sbcl-ppc-core
 	tar cvjf sbcl-$(SBCL_VER)-ppc.tar.bz2 build/sbcl/ppc
 
-sbcl: sbcl-$(shell uname -p)-core sbcl-bin
+sbcl: sbcl-$(shell uname -p)-core build/sbcl/sbcl
 
 ######################################################################
 
@@ -139,7 +141,7 @@ SLIME_GIT=git://github.com/nablaone/slime.git
 slime-git:
 	@test -d slime || git clone $(SLIME_GIT)
 
-slime-elc:
+slime/slime.elc: slime/slime.el
 	find slime -name '*.el' -type f | \
 	while read file; do \
 	    EMACSDATA="$(RESOURCES)/etc" \
@@ -157,6 +159,11 @@ slime-elc:
 		--eval '(setq byte-compile-warnings nil)' \
 		-batch -f batch-byte-compile $$file; \
 	done
+
+slime-doc: slime/doc/slime.pdf
+	(cd slime/doc; make)
+
+slime-build: slime/slime.elc slime-doc
 
 ######################################################################
 
@@ -249,70 +256,79 @@ site-lisp-elc:
 
 ######################################################################
 
-install: all
-	rsync -av --delete slime/ \
-		Ready\ Lisp.app/Contents/Resources/site-lisp/edit-modes/slime/
-	rsync -av site-lisp/ Ready\ Lisp.app/Contents/Resources/site-lisp/
-	cp -p slime/doc/slime.info* \
-		Ready\ Lisp.app/Contents/Resources/info/
-	cp -p info/* Ready\ Lisp.app/Contents/Resources/info/
-	cp -p $(SBCL_I386)/share/info/*.info* \
-		Ready\ Lisp.app/Contents/Resources/info/
-	rsync -av $(SBCL_I386)/share/man/ \
-		Ready\ Lisp.app/Contents/Resources/man/
-	-mkdir -p Ready\ Lisp.app/Contents/Resources/doc/
-	cp -p $(SBCL_I386)/share/doc/sbcl/*.pdf \
-		Ready\ Lisp.app/Contents/Resources/doc/
-	cp -p slime/doc/*.pdf \
-		Ready\ Lisp.app/Contents/Resources/doc/
-	-mkdir -p Ready\ Lisp.app/Contents/Resources/html/
-	rsync -av --delete $(HOME)/Projects/dpans2texi-1.03/ansicl.html/ \
-		Ready\ Lisp.app/Contents/Resources/html/hyperspec/
-	rsync -av --delete slime/doc/html/ \
-		Ready\ Lisp.app/Contents/Resources/html/slime/
-	rsync -av --delete $(SBCL_I386)/share/doc/sbcl/html/asdf/ \
-		Ready\ Lisp.app/Contents/Resources/html/asdf/
-	rsync -av --delete $(SBCL_I386)/share/doc/sbcl/html/sbcl/ \
-		Ready\ Lisp.app/Contents/Resources/html/sbcl/
-	rsync -av --delete site/ Ready\ Lisp.app/Contents/Resources/sbcl/site/
-	ln -f bootstrap.lisp Ready\ Lisp.app/Contents/Resources/
-	rm -fr Ready\ Lisp.app/Contents/Resources/sbcl/*/share
-	rm -f Ready\ Lisp.app/Contents/Resources/sbcl/*/bin/sbcl
-	rm -f Ready\ Lisp.app/Contents/Resources/sbcl/*/lib/sbcl/sbcl.core*
-	ln -f sbcl Ready\ Lisp.app/Contents/Resources/sbcl/
-	ln -f sbcl.core-with-slime-i386 Ready\ Lisp.app/Contents/Resources/sbcl/
-	ln -f sbcl.core-with-slime-x86_64 Ready\ Lisp.app/Contents/Resources/sbcl/
-	ln -f sbcl.core-with-slime-ppc Ready\ Lisp.app/Contents/Resources/sbcl/
-	chmod -R go+rX .
+APP=/tmp/Ready Lisp/Ready Lisp.app
 
-uninstall:
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/bootstrap.lisp
-	rm -fr aquamacs/Aquamacs\ Emacs.app/Contents/Resources/sbcl*
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/site-lisp/cldoc.el*
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/site-lisp/init-lisp.el*
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/site-lisp/paredit.el*
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/site-lisp/redshank.el*
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/site-lisp/site-start.el*
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/info/ansicl*
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/info/slime.info*
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/info/sbcl.info*
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/sbcl/sbcl
-	rm -f aquamacs/Aquamacs\ Emacs.app/Contents/Resources/sbcl/sbcl.core*
-	rm -fr aquamacs/Aquamacs\ Emacs.app/Contents/Resources/site-lisp/edit-modes/slime
-
-dist: install
+dmg:
 	rm -fr /tmp/Ready\ Lisp
 	mkdir /tmp/Ready\ Lisp
-	rsync -aEHS Ready\ Lisp.app /tmp/Ready\ Lisp
-	cp -p README.txt NEWS.txt /tmp/Ready\ Lisp
+	mkdir /tmp/Ready\ Lisp/.background
+	cp -p README NEWS /tmp/Ready\ Lisp
+	cp -p dist/image.png /tmp/Ready\ Lisp/.background
+	cp -p dist/DS_Store /tmp/Ready\ Lisp/.DS_Store
+	rsync -aE aquamacs/"$(AQUA_APP)"/ "$(APP)"/
+	rsync -a --delete slime/ \
+		"$(APP)"/Contents/Resources/site-lisp/edit-modes/slime/
+	rsync -av site-lisp/ "$(APP)"/Contents/Resources/site-lisp/
+	patch -p0 -d "$(APP)"/Contents/Resources < site-lisp/site-start.patch
+	patch -p1 -d "$(APP)"/Contents/Resources < doc/info/dir.patch
+	rsync -av --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
+		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
+	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
+	rsync -av systems/ "$(APP)"/Contents/Resources/sbcl/systems/
+	chmod -R go+rX /tmp/Ready\ Lisp
 	(cd /tmp; \
 	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
-		ReadyLisp-$(SBCL_VER)-$(VERSION).dmg)
-	mv /tmp/ReadyLisp-$(SBCL_VER)-$(VERSION).dmg .
+		ReadyLisp-$(VERSION).dmg)
+	mv /tmp/ReadyLisp-$(VERSION).dmg build
+
+dist2:
+	rm -fr /tmp/Ready\ Lisp
+	mkdir /tmp/Ready\ Lisp
+	mkdir /tmp/Ready\ Lisp/.background
+	cp -p README NEWS /tmp/Ready\ Lisp
+	cp -p dist/image.png /tmp/Ready\ Lisp/.background
+	cp -p dist/DS_Store /tmp/Ready\ Lisp/.DS_Store
+	rsync -aE aquamacs/"$(AQUA_APP)"/ "$(APP)"/
+	rsync -a --delete slime/ \
+		"$(APP)"/Contents/Resources/site-lisp/edit-modes/slime/
+	rsync -av site-lisp/ "$(APP)"/Contents/Resources/site-lisp/
+	cp -p slime/doc/slime.info* "$(APP)"/Contents/Resources/info/
+	cp -p doc/info/ansi* "$(APP)"/Contents/Resources/info/
+	cp -p $(SBCL_I386)/share/info/*.info* "$(APP)"/Contents/Resources/info/
+	patch -p0 -d "$(APP)"/Contents/Resources < site-lisp/site-start.patch
+	patch -p1 -d "$(APP)"/Contents/Resources < doc/info/dir.patch
+	rsync -av $(SBCL_I386)/share/man/ "$(APP)"/Contents/Resources/man/
+	mkdir Ready\ Lisp.app/Contents/Resources/pdf/
+	cp -p $(SBCL_I386)/share/doc/sbcl/*.pdf "$(APP)"/Contents/Resources/pdf/
+	cp -p slime/doc/*.pdf "$(APP)"/Contents/Resources/pdf/
+	mkdir Ready\ Lisp.app/Contents/Resources/html/
+	rsync -av doc/html/hyperspec "$(APP)"/Contents/Resources/html
+	rsync -av slime/doc/html/ "$(APP)"/Contents/Resources/html/slime/
+	rsync -av $(SBCL_I386)/share/doc/sbcl/html/asdf \
+		"$(APP)"/Contents/Resources/html
+	rsync -av $(SBCL_I386)/share/doc/sbcl/html/sbcl \
+		"$(APP)"/Contents/Resources/html
+	mv "$(APP)"/Contents/Resources/Aquamacs\ Help \
+		"$(APP)"/Contents/Resources/html
+	mv "$(APP)"/Contents/Resources/Emacs\ Lisp\ Reference \
+		"$(APP)"/Contents/Resources/html
+	mv "$(APP)"/Contents/Resources/elisp \
+		"$(APP)"/Contents/Resources/html
+	mv "$(APP)"/Contents/Resources/Emacs\ Manual \
+		"$(APP)"/Contents/Resources/html
+	rsync -av --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
+		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
+	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
+	chmod -R go+rX /tmp/Ready\ Lisp
+	(cd /tmp; \
+	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
+		ReadyLisp-$(VERSION).dmg)
+	mv /tmp/ReadyLisp-$(VERSION).dmg build
 
 clean:
 	rm -fr build *.dmg
-	find site-lisp -name '*.elc' -delete
+	find slime -name '*.fasl' -delete
+	find slime site-lisp -name '*.elc' -delete
 
 scour: clean
 	rm -fr sbcl slime systems site
