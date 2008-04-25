@@ -1,57 +1,162 @@
-SBCL_VERSION = 1.0.12
-VERSION = 10.5.1-2
+VERSION = $(date +%Y%m%d)
 
-SBCL_X86_64 = /usr/local/stow/sbcl-$(SBCL_VERSION)-x86_64
-SBCL_I386   = /usr/local/stow/sbcl-$(SBCL_VERSION)-i386
-SBCL_PPC    = /usr/local/stow/sbcl-$(SBCL_VERSION)-ppc
+SBCL_VER = $(shell ./sbcl-ver)
 
-all: dependencies
+PWD = $(shell pwd)
 
-#all:	sbcl \
-#	sbcl.core-with-slime-x86_64 \
-#	sbcl.core-with-slime-i386
+SBCL_I386   = $(PWD)/build/sbcl/i386
+SBCL_X86_64 = $(PWD)/build/sbcl/x86_64
+SBCL_PPC    = $(PWD)/build/sbcl/ppc
+
+SBCL_I386_LIB   = $(SBCL_I386)/lib/sbcl
+SBCL_X86_64_LIB = $(SBCL_X86_64)/lib/sbcl
+SBCL_PPC_LIB    = $(SBCL_PPC)/lib/sbcl
+
+SBCL_I386_CORE   = $(SBCL_I386_LIB)/sbcl.core-with-slime
+SBCL_X86_64_CORE = $(SBCL_X86_64_LIB)/sbcl.core-with-slime
+SBCL_PPC_CORE    = $(SBCL_PPC_LIB)/sbcl.core-with-slime
+
+all: dependencies sbcl slime-elc site-lisp-elc dist
 
 ######################################################################
 
-dependencies: aquamacs sbcl slime cl-fad cl-ppcre local-time series systems
-	echo Dependencies are up-to-date.
+dependencies: aquamacs sbcl-git slime-git \
+	cl-fad cl-ppcre local-time series systems
+	@echo Dependencies are up-to-date.
 
 ######################################################################
 
 AQUA_VER=1.3b
 AQUA_DMG=Aquamacs-Emacs-$(AQUA_VER).dmg
 AQUA_URL=http://www.tardis.ed.ac.uk/~dreitter/$(AQUA_DMG)
-AQUA_APP="Aquamacs Emacs.app"
+AQUA_APP=Aquamacs Emacs.app
+
+RESOURCES = aquamacs/$(AQUA_APP)/Contents/Resources
 
 aquamacs/$(AQUA_DMG):
-	test -d aquamacs || mkdir aquamacs
-	curl -O $@ $(AQUA_URL)
+	@test -d aquamacs || mkdir aquamacs
+	curl -Lo "$@" "$(AQUA_URL)"
 
-aquamacs/$(AQUA_APP): aquamacs/$(AQUA_DMG)
-	hdiutil attach aquamacs/$(AQUA_DMG)
-	cp -R /Volumes/Aquamacs\ Emacs/$(AQUA_APP) aquamacs
-	hdiutil detach Aquamacs\ Eamcs
+aquamacs-app: aquamacs/$(AQUA_DMG)
+	@test -d "aquamacs/$(AQUA_APP)" || \
+	    (hdiutil attach aquamacs/$(AQUA_DMG) && \
+	    cp -R "/Volumes/Aquamacs Emacs/$(AQUA_APP)" aquamacs && \
+	    hdiutil detach /Volumes/Aquamacs\ Emacs)
 
-aquamacs: aquamacs/$(AQUA_APP)
+aquamacs: aquamacs-app
+
+apply-patches: site-lisp/site-start.patch
+	patch -N -p0 < site-lisp/site-start.patch
 
 ######################################################################
 
 SBCL_GIT=git://sbcl.boinkor.net/sbcl.git
 
-sbcl:
-	git clone $(SBCL_GIT)
+sbcl-git:
+	@test -d sbcl || git clone $(SBCL_GIT)
+
+sbcl/version.lisp-expr: sbcl-git
+
+# (cd tests; sh run-tests.sh); \
+
+$(SBCL_PPC)/bin/sbcl: sbcl-git
+	(cd sbcl && sh clean.sh && sh make.sh && \
+	 rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) && \
+	 INSTALL_ROOT=$(SBCL_PPC) sh install.sh)
+
+sbcl-ppc: $(SBCL_PPC)/bin/sbcl
+
+$(SBCL_X86_64)/bin/sbcl: sbcl/version.lisp-expr
+	(cd sbcl && sh clean.sh && SBCL_ARCH=x86-64 sh make.sh && \
+	 rm -fr $(SBCL_X86_64) && mkdir -p $(SBCL_X86_64) && \
+	 INSTALL_ROOT=$(SBCL_X86_64) sh install.sh)
+
+sbcl-x86_64: $(SBCL_X86_64)/bin/sbcl
+
+$(SBCL_I386)/bin/sbcl: sbcl/version.lisp-expr
+	(cd sbcl && sh clean.sh && sh make.sh && \
+	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) && \
+	 INSTALL_ROOT=$(SBCL_I386) sh install.sh)
+
+sbcl-i386: $(SBCL_I386)/bin/sbcl
+
+sbcl-bin: sbcl-$(shell uname -p)
+	if [   -f sbcl-$(SBCL_VER)-ppc.tar.bz2 -a \
+	     ! -d $(SBCL_PPC) ]; then \
+	    tar xvjf sbcl-$(SBCL_VER)-ppc.tar.bz2; \
+	fi
+	if [ -x $(SBCL_PPC)/bin/sbcl ]; then \
+	    lipo -create \
+		-arch x86_64 $(SBCL_X86_64)/bin/sbcl \
+		-arch i386   $(SBCL_I386)/bin/sbcl \
+		-arch ppc    $(SBCL_PPC)/bin/sbcl \
+		-output $@; \
+	else \
+	    lipo -create \
+		-arch x86_64 $(SBCL_X86_64)/bin/sbcl \
+		-arch i386   $(SBCL_I386)/bin/sbcl \
+		-output $@; \
+	fi
+
+$(SBCL_PPC_CORE): sbcl-ppc bootstrap.lisp
+	find slime site -name '*.fasl' -delete
+	rm -fr ~/.slime
+	SBCL_HOME=$(SBCL_PPC_LIB) $(SBCL_PPC)/bin/sbcl \
+		--core $(SBCL_PPC_LIB)/sbcl.core \
+		--load bootstrap.lisp
+	mv sbcl.core-with-slime $@
+
+$(SBCL_X86_64_CORE): sbcl-x86_64 bootstrap.lisp
+	find slime site -name '*.fasl' -delete
+	rm -fr ~/.slime
+	SBCL_HOME=$(SBCL_X86_64_LIB) $(SBCL_X86_64)/bin/sbcl \
+		--core $(SBCL_X86_64_LIB)/sbcl.core \
+		--load bootstrap.lisp
+	mv sbcl.core-with-slime $@
+
+sbcl-x86_64-core: $(SBCL_X86_64_CORE)
+
+$(SBCL_I386_CORE): sbcl-i386 bootstrap.lisp
+	find slime site -name '*.fasl' -delete
+	rm -fr ~/.slime
+	SBCL_HOME=$(SBCL_I386_LIB) $(SBCL_I386)/bin/sbcl \
+		--core $(SBCL_I386_LIB)/sbcl.core \
+		--load bootstrap.lisp
+	mv sbcl.core-with-slime $@
+
+# Building the i386 core is preceded by building the x86_64 core
+sbcl-i386-core: $(SBCL_I386_CORE) sbcl-x86_64-core
+
+ppc: sbcl-ppc-core
+	tar cvjf sbcl-$(SBCL_VER)-ppc.tar.bz2 build/sbcl/ppc
+
+sbcl: sbcl-$(shell uname -p)-core sbcl-bin
 
 ######################################################################
 
 SLIME_GIT=git://github.com/nablaone/slime.git
 
-slime:
-	git clone $(SLIME_GIT)
+slime-git:
+	@test -d slime || git clone $(SLIME_GIT)
 
-######################################################################
-
-site:
-	mkdir site
+slime-elc:
+	find slime -name '*.el' -type f | \
+	while read file; do \
+	    EMACSDATA="$(RESOURCES)/etc" \
+	    EMACSDOC="$(RESOURCES)/etc" \
+	    EMACSPATH="$(RESOURCES)/libexec" \
+	    "$(RESOURCES)"/../MacOS/"Aquamacs Emacs" -q --no-site-file \
+		-L "$(RESOURCES)"/lisp \
+		-L "$(RESOURCES)"/lisp/international \
+		-L "$(RESOURCES)"/lisp/emacs-lisp \
+		-L "$(RESOURCES)"/lisp/progmodes \
+		-L "$(RESOURCES)"/lisp/net \
+		-L slime \
+		-L slime/contrib \
+		-l slime/slime.el \
+		--eval '(setq byte-compile-warnings nil)' \
+		-batch -f batch-byte-compile $$file; \
+	done
 
 ######################################################################
 
@@ -61,26 +166,29 @@ CL_FAD_TGZ=cl-fad.tar.gz
 CL_FAD_TGZ_URL=http://weitz.de/files/$(CL_FAD_TGZ)
 
 site/$(CL_FAD_TGZ):
-	curl -O $@ $(CL_FAD_TGZ_URL)
+	@test -d site || mkdir site
+	curl -Lo $@ $(CL_FAD_TGZ_URL)
 
-site/cl-fad: site site/$(CL_FAD_TGZ)
+site/cl-fad-$(CL_FAD_VER): site site/$(CL_FAD_TGZ)
 	(cd site; tar xvzf $(CL_FAD_TGZ))
 
-cl-fad: site/cl-fad
+cl-fad: site/cl-fad-$(CL_FAD_VER)
 
 ######################################################################
 
 CL_PPCRE_URL=http://www.weitz.de/cl-ppcre/
+CL_PPCRE_VER=1.3.2
 CL_PPCRE_TGZ=cl-ppcre.tar.gz
 CL_PPCRE_TGZ_URL=http://weitz.de/files/$(CL_PPCRE_TGZ)
 
 site/$(CL_PPCRE_TGZ):
-	curl -O $@ $(CL_PPCRE_TGZ_URL)
+	@test -d site || mkdir site
+	curl -Lo $@ $(CL_PPCRE_TGZ_URL)
 
-site/cl-ppcre: site site/$(CL_PPCRE_TGZ)
+site/cl-ppcre-$(CL_PPCRE_VER): site site/$(CL_PPCRE_TGZ)
 	(cd site; tar xvzf $(CL_PPCRE_TGZ))
 
-cl-ppcre: site/cl-ppcre
+cl-ppcre: site/cl-ppcre-$(CL_PPCRE_VER)
 
 ######################################################################
 
@@ -90,12 +198,13 @@ LOCAL_TIME_TGZ=local-time-$(LOCAL_TIME_VER).tar.gz
 LOCAL_TIME_TGZ_URL=http://common-lisp.net/project/local-time/$(LOCAL_TIME_TGZ)
 
 site/$(LOCAL_TIME_TGZ):
-	curl -O $@ $(LOCAL_TIME_TGZ_URL)
+	@test -d site || mkdir site
+	curl -Lo $@ $(LOCAL_TIME_TGZ_URL)
 
-site/local-time: site site/$(LOCAL_TIME_TGZ)
+site/local-time-$(LOCAL_TIME_VER): site site/$(LOCAL_TIME_TGZ)
 	(cd site; tar xvzf $(LOCAL_TIME_TGZ))
 
-local-time: site/local-time
+local-time: site/local-time-$(LOCAL_TIME_VER)
 
 ######################################################################
 
@@ -104,65 +213,41 @@ SERIES_VER=2.2.9
 SERIES_TBZ=series-$(SERIES_VER).tar.bz2
 SERIES_TBZ_URL=http://downloads.sourceforge.net/series/$(SERIES_TBZ)
 
-site/$(SERIES_TGZ):
-	curl -O $@ $(SERIES_TBZ_URL)
+site/$(SERIES_TBZ):
+	@test -d site || mkdir site
+	curl -Lo $@ $(SERIES_TBZ_URL)
 
-site/series: site site/$(SERIES_TBZ)
+site/series-$(SERIES_VER): site site/$(SERIES_TBZ)
 	(cd site; tar xvjf $(SERIES_TBZ))
 
-series: site/series
+series: site/series-$(SERIES_VER)
 
 ######################################################################
 
 systems:
+	@test -d systems || mkdir systems
 	(cd systems; ln -sf ../site/*/*.asd .)
 
 ######################################################################
 
-sbcl: $(SBCL_X86_64)/bin/sbcl $(SBCL_I386)/bin/sbcl
-	lipo -create \
-		-arch x86_64 $(SBCL_X86_64)/bin/sbcl \
-		-arch i386   $(SBCL_I386)/bin/sbcl \
-		-arch ppc    $(SBCL_PPC)/bin/sbcl \
-		-output $@
-
-sbcl.core-with-slime-x86_64: $(SBCL_X86_64) bootstrap.lisp
-	find $(HOME)/Library/Lisp . -name '*.fasl' -exec rm {} \;
-	rm -fr ~/.slime
-	$(SBCL_X86_64)/bin/sbcl \
-		--core $(SBCL_X86_64)/lib/sbcl/sbcl.core \
-		--load bootstrap.lisp
-	mv sbcl.core-with-slime $@
-
-sbcl.core-with-slime-i386: $(SBCL_I386) bootstrap.lisp
-	find $(HOME)/Library/Lisp . -name '*.fasl' -exec rm {} \;
-	rm -fr ~/.slime
-	$(SBCL_I386)/bin/sbcl \
-		--core $(SBCL_I386)/lib/sbcl/sbcl.core \
-		--load bootstrap.lisp
-	mv sbcl.core-with-slime $@
-
-sbcl.core-with-slime-ppc: $(SBCL_PPC) bootstrap.lisp
-	find $(HOME)/.sbcl . -name '*.fasl' -exec rm {} \;
-	rm -fr ~/.slime
-	$(SBCL_PPC)/bin/sbcl \
-		--core $(SBCL_PPC)/lib/sbcl/sbcl.core \
-		--load bootstrap.lisp \
-		--eval "(sb-ext:save-lisp-and-die \"$@\")"
-
-RESOURCES = $(shell pwd)/Ready Lisp.app/Contents/Resources
-
-elc:
-	find site-lisp -type d ! -name CVS ! -name doc ! -name html -print | \
-	while read dir; do \
+site-lisp-elc:
+	find site-lisp -name '*.el' ! -name init-lisp.el -type f | \
+	while read file; do \
 	    EMACSDATA="$(RESOURCES)/etc" \
 	    EMACSDOC="$(RESOURCES)/etc" \
-	    EMACSLOADPATH="$(RESOURCES)/lisp:$(RESOURCES)/site-lisp:$(shell pwd)/site-lisp:$(shell pwd)/slime:$(shell pwd)/slime/contrib" \
 	    EMACSPATH="$(RESOURCES)/libexec" \
-	    ./Ready\ Lisp.app/Contents/MacOS/bin/emacs -q --no-site-file -batch \
-		-l slime/slime.el -f batch-byte-compile $$dir/*.el; \
+	    "$(RESOURCES)"/../MacOS/"Aquamacs Emacs" -q --no-site-file \
+		-L "$(RESOURCES)"/lisp \
+		-L "$(RESOURCES)"/lisp/international \
+		-L "$(RESOURCES)"/lisp/emacs-lisp \
+		-L "$(RESOURCES)"/lisp/progmodes \
+		-L "$(RESOURCES)"/lisp/net \
+		-L site-lisp \
+		--eval '(setq byte-compile-warnings nil)' \
+		-batch -f batch-byte-compile $$file; \
 	done
-	rm -f site-lisp/init-lisp.elc site-lisp/site-start.elc
+
+######################################################################
 
 install: all
 	rsync -av --delete slime/ \
@@ -222,30 +307,12 @@ dist: install
 	cp -p README.txt NEWS.txt /tmp/Ready\ Lisp
 	(cd /tmp; \
 	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
-		ReadyLisp-$(SBCL_VERSION)-$(VERSION).dmg)
-	mv /tmp/ReadyLisp-$(SBCL_VERSION)-$(VERSION).dmg .
+		ReadyLisp-$(SBCL_VER)-$(VERSION).dmg)
+	mv /tmp/ReadyLisp-$(SBCL_VER)-$(VERSION).dmg .
 
 clean:
-	rm -f sbcl sbcl.core-with-slime-x86_64 sbcl.core-with-slime-i386
-	find site-lisp -name '*.elc' -exec rm {} \;
+	rm -fr build *.dmg
+	find site-lisp -name '*.elc' -delete
 
-# This must be run as root on my machine (sudo make -j1 bootstrap); it also
-# assumes CMUCL is installed.
-bootstrap:
-	(cd /usr/local/stow && \
-	 stow -D $(shell basename $(SBCL_X86_64)) && \
-	 stow -D $(shell basename $(SBCL_I386)) && \
-	 rm -fr $(SBCL_X86_64) $(SBCL_I386) && \
-	 (cd /usr/local/src && \
-	  rm -fr sbcl-$(SBCL_VERSION) && \
-	  tar xvjf ~johnw/Public/lisp/sbcl-$(SBCL_VERSION)-source.tar.bz2 && \
-	  cd sbcl-$(SBCL_VERSION) && \
-	  sh make.sh 'lisp -batch -noinit' && \
-	    INSTALL_ROOT=$(SBCL_I386) sh install.sh) && \
-	 stow $(shell basename $(SBCL_I386)) && \
-	 (cd /usr/local/src/sbcl-$(SBCL_VERSION) && \
-	  sh clean.sh && \
-	  SBCL_ARCH=x86-64 sh make.sh && \
-	    INSTALL_ROOT=$(SBCL_X86_64) sh install.sh) && \
-	 stow -D $(shell basename $(SBCL_I386)) && \
-	 stow $(shell basename $(SBCL_X86_64)))
+scour: clean
+	rm -fr sbcl slime systems site
