@@ -359,8 +359,8 @@ dist2:
 
 clean:
 	rm -fr build *.dmg
-	test -d slime && find slime -name '*.fasl' -delete
-	test -d slime && find slime -name '*.elc' -delete
+	test ! -d slime || find slime -name '*.fasl' -delete
+	test ! -d slime || find slime -name '*.elc' -delete
 	find site-lisp -name '*.elc' -delete
 
 scour: clean
