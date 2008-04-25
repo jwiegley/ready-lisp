@@ -10,17 +10,20 @@
 (asdf:operate 'asdf:load-op :cl-ppcre)
 (asdf:operate 'asdf:load-op :series)
 (asdf:operate 'asdf:load-op :local-time)
-(asdf:operate 'asdf:load-op :memoize)
+
+(pushnew "slime/" asdf:*central-registry*)
+
+(asdf:operate 'asdf:load-op :swank)
 
 (load "slime/swank-loader")
 
-(dolist (module '("swank-arglists"
+(dolist (module '("swank-c-p-c"
+		  "swank-arglists"
 		  "swank-asdf"
-		  "swank-c-p-c"
 		  "swank-fancy-inspector"
 		  "swank-fuzzy"
-		  "swank-presentation-streams"
-		  "swank-presentations"))
+		  "swank-presentations"
+		  "swank-presentation-streams"))
   (load (merge-pathnames "slime/contrib/" module)))
 
 (print *modules*)
