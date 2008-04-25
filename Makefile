@@ -127,7 +127,7 @@ $(SBCL_PPC)/bin/sbcl: \
 	 SBCL_HOME=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/contrib \
 	 PATH=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/src/runtime:$(PATH) sh make.sh && \
 	 (test ! -x $(shell which latex) || \
-		(cd sbcl/doc && sh make-doc.sh && cd manual && make)); \
+	     (cd doc && sh make-doc.sh && cd manual && make)); \
 	 rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) && \
 	 INSTALL_ROOT=$(SBCL_PPC) sh install.sh)
 
@@ -138,7 +138,7 @@ $(SBCL_X86_64)/bin/sbcl: \
 	 SBCL_ARCH=x86-64 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib \
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH) sh make.sh && \
 	 (test ! -x $(shell which latex) || \
-		(cd sbcl/doc && sh make-doc.sh && cd manual && make)); \
+	     (cd doc && sh make-doc.sh && cd manual && make)); \
 	 rm -fr $(SBCL_X86_64) && mkdir -p $(SBCL_X86_64) && \
 	 INSTALL_ROOT=$(SBCL_X86_64) sh install.sh)
 
@@ -149,7 +149,7 @@ $(SBCL_I386)/bin/sbcl: \
 	 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib \
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH) sh make.sh && \
 	 (test ! -x $(shell which latex) || \
-		(cd sbcl/doc && sh make-doc.sh && cd manual && make)); \
+	     (cd doc && sh make-doc.sh && cd manual && make)); \
 	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) && \
 	 INSTALL_ROOT=$(SBCL_I386) sh install.sh)
 
