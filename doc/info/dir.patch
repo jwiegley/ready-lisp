@@ -1,0 +1,15 @@
+--- doc/info/dir	2008-04-25 02:06:16.000000000 -0400
++++ aquamacs/Aquamacs Emacs.app/Contents/Resources/info/dir	2008-04-25 02:05:58.000000000 -0400
+@@ -21,6 +21,12 @@
+ * Menu:
+ 
+ 
++Common Lisp
++* HyperSpec: (ansicl).  The Common Lisp HyperSpec.
++* ASDF: (asdf).         ASDF package management system for Common Lisp.
++* SBCL: (sbcl).         The SBCL Manual.
++* SLIME: (slime).       The Superior Lisp Interaction Mode for Emacs.
++
+ Emacs
+ * Ada mode: (ada-mode). Emacs mode for editing and compiling Ada code.
+ * Autotype: (autotype). Convenient features for text that you enter frequently
