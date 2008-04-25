@@ -141,7 +141,7 @@ $(SBCL_I386_CORE): $(SBCL_I386)/bin/sbcl bootstrap.lisp
 # Building the i386 core is preceded by building the x86_64 core
 sbcl-i386-core: $(SBCL_I386_CORE) sbcl-x86_64-core
 
-ppc: sbcl-ppc-core
+ppc-tarball: sbcl-ppc-core
 	tar cvjf sbcl-$(SBCL_VER)-ppc.tar.bz2 build/sbcl/ppc
 
 sbcl: sbcl-$(shell uname -p)-core build/sbcl/sbcl
