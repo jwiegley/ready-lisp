@@ -40,5 +40,21 @@ version), edit the init-lisp.el file mentioned about and change the value of
 the variable `slime-use-intel-x86-64' from "t" to "nil".  Then type
 `M-x byte-compile-file' to recompile init-lisp.el, and restart Ready Lisp.
 
+
 Happy Lisping,
   John Wiegley @ http://www.newartisans.com
+
+----------------------------------------------------------------------
+
+
+p.s. If you are interested in building Ready Lisp yourself, the process has
+     been made quite simple:
+
+       $ git clone git://newartisans.com/readylisp.git
+       $ cd readylisp
+       $ make
+
+     This will take quite some time, but will eventually leave a disk image in
+     the "build" subdirectory which matches the current version of Ready Lisp.
+     Edit the Makefile if you wish to update any of the sub-packages to newer
+     versions.
