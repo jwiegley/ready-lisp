@@ -88,13 +88,11 @@
 
 (autoload 'paredit-mode "paredit"
   "Minor mode for pseudo-structurally editing Lisp code." t)
-(autoload 'turn-on-paredit-mode "paredit"
-  "Minor mode for pseudo-structurally editing Lisp code." t)
 
 (dolist (hook '(emacs-lisp-mode-hook
 		lisp-mode-hook
 		slime-repl-mode-hook))
-  (add-hook hook 'turn-on-paredit-mode))
+  (add-hook hook #'(lambda () (paredit-mode +1))))
 
 ;;;_ * redhank
 
