@@ -39,7 +39,7 @@ update:
 
 ######################################################################
 
-dependencies: aquamacs sbcl-git slime-git \
+dependencies: aquamacs sbcl-git slime-git hyperspec \
 	cl-fad cl-ppcre local-time series systems
 	@echo Dependencies are up-to-date.
 
@@ -263,6 +263,20 @@ site-lisp-elc: site-lisp/cldoc.el site-lisp/paredit.el site-lisp/redshank.el
 
 ######################################################################
 
+HYPERSPEC_TGZ=HyperSpec-7-0.tar.gz
+HYPERSPEC_TGZ_URL=ftp://ftp.lispworks.com/pub/software_tools/reference/$(HYPERSPEC_TGZ)
+
+doc/html/$(HYPERSPEC_TGZ):
+	@test -d doc/html || mkdir doc/html
+	curl -Lo $@ $(HYPERSPEC_TGZ_URL)
+
+doc/html/HyperSpec: doc/html/$(HYPERSPEC_TGZ)
+	(cd doc/html; tar xvzf $(HYPERSPEC_TGZ))
+
+hyperspec: doc/html/HyperSpec
+
+######################################################################
+
 APP=/tmp/Ready Lisp/Ready Lisp.app
 
 disk-image:
@@ -312,7 +326,7 @@ dist2:
 	cp -p $(SBCL_I386)/share/doc/sbcl/*.pdf "$(APP)"/Contents/Resources/pdf/
 	cp -p slime/doc/*.pdf "$(APP)"/Contents/Resources/pdf/
 	mkdir Ready\ Lisp.app/Contents/Resources/html/
-	rsync -av doc/html/hyperspec "$(APP)"/Contents/Resources/html
+	rsync -av doc/html/HyperSpec "$(APP)"/Contents/Resources/html
 	rsync -av slime/doc/html/ "$(APP)"/Contents/Resources/html/slime/
 	rsync -av $(SBCL_I386)/share/doc/sbcl/html/asdf \
 		"$(APP)"/Contents/Resources/html
