@@ -7,7 +7,23 @@ VERSION	       = $(shell date +%Y%m%d)
 SBCL_VER       = $(shell ./sbcl-ver)
 SLIME_VER      = $(shell ./slime-ver)
 
+# Go to sbcl.org and check the Downloads page to find out what versions these
+# should be now.
+
+SBCL_BOOTSTRAP_VER     = 1.0.12
+SBCL_PPC_BOOTSTRAP_VER = 1.0.2
+
+# This version is from aquamacs.org.
+
 AQUA_VER       = 1.3b
+
+# These versions should much more rarely.  Here are the URLs where you can
+# check for the latest:
+#
+#  CL-FAD      http://www.weitz.de/cl-fad/
+#  CL-PPCRE    http://www.weitz.de/cl-ppcre/
+#  LOCAL-TIME  http://common-lisp.net/project/local-time/
+#  SERIES      http://series.sourceforge.net/
 
 CL_FAD_VER     = 0.6.2
 CL_PPCRE_VER   = 1.3.2
@@ -69,47 +85,99 @@ apply-patches: site-lisp/site-start.patch
 
 SBCL_GIT=git://sbcl.boinkor.net/sbcl.git
 
-sbcl-git:
+sbcl/version.lisp-expr:
 	@test -f sbcl/version.lisp-expr || \
 		(rm -fr sbcl; git clone $(SBCL_GIT))
 
-sbcl/version.lisp-expr: sbcl-git
+sbcl-git: sbcl/version.lisp-expr
+
+SBCL_BOOTSTRAP=sbcl-$(SBCL_BOOTSTRAP_VER)-x86-darwin
+SBCL_BOOTSTRAP_TBZ=$(SBCL_BOOTSTRAP)-binary.tar.bz2
+SBCL_BOOTSTRAP_TBZ_URL=http://prdownloads.sourceforge.net/sbcl/$(SBCL_BOOTSTRAP_TBZ)
+
+SBCL_PPC_BOOTSTRAP=sbcl-$(SBCL_PPC_BOOTSTRAP_VER)-powerpc-darwin
+SBCL_PPC_BOOTSTRAP_TBZ=$(SBCL_PPC_BOOTSTRAP)-binary.tar.bz2
+SBCL_PPC_BOOTSTRAP_TBZ_URL=http://prdownloads.sourceforge.net/sbcl/$(SBCL_PPC_BOOTSTRAP_TBZ)
+
+$(SBCL_BOOTSTRAP_TBZ):
+	curl -Lo $@ $(SBCL_BOOTSTRAP_TBZ_URL)
+
+$(SBCL_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_BOOTSTRAP_TBZ)
+	tar xvjf $(SBCL_BOOTSTRAP_TBZ)
+	mv $(SBCL_BOOTSTRAP)/output/sbcl.core $(SBCL_BOOTSTRAP)/contrib
+	touch $(SBCL_BOOTSTRAP)/src/runtime/sbcl
+
+sbcl-bootstrap: $(SBCL_BOOTSTRAP)/src/runtime/sbcl
+
+$(SBCL_PPC_BOOTSTRAP_TBZ):
+	curl -Lo $@ $(SBCL_PPC_BOOTSTRAP_TBZ_URL)
+
+$(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_PPC_BOOTSTRAP_TBZ)
+	tar xvjf $(SBCL_PPC_BOOTSTRAP_TBZ)
+	mv $(SBCL_PPC_BOOTSTRAP)/output/sbcl.core $(SBCL_PPC_BOOTSTRAP)/contrib
+	touch $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl
+
+sbcl-ppc-bootstrap: $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl
 
 # (cd tests; sh run-tests.sh); \
 
-$(SBCL_PPC)/bin/sbcl: sbcl-git
-	(cd sbcl && sh clean.sh && sh make.sh && \
-	 (cd doc && sh make-doc.sh) && \
+$(SBCL_PPC)/bin/sbcl: \
+	sbcl/version.lisp-expr $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl
+	(cd sbcl && sh clean.sh && \
+	 SBCL_HOME=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/contrib \
+	 PATH=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/src/runtime:$(PATH) sh make.sh && \
+	 (test ! -x $(shell which latex) || \
+		(cd sbcl/doc && sh make-doc.sh && cd manual && make)); \
 	 rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) && \
 	 INSTALL_ROOT=$(SBCL_PPC) sh install.sh)
 
-$(SBCL_X86_64)/bin/sbcl: sbcl/version.lisp-expr
-	(cd sbcl && sh clean.sh && SBCL_ARCH=x86-64 sh make.sh && \
+$(SBCL_X86_64)/bin/sbcl: \
+	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
+	@echo Building SBCL for X86_64 again!
+	(cd sbcl && sh clean.sh && \
+	 SBCL_ARCH=x86-64 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib \
+	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH) sh make.sh && \
+	 (test ! -x $(shell which latex) || \
+		(cd sbcl/doc && sh make-doc.sh && cd manual && make)); \
 	 rm -fr $(SBCL_X86_64) && mkdir -p $(SBCL_X86_64) && \
 	 INSTALL_ROOT=$(SBCL_X86_64) sh install.sh)
 
-$(SBCL_I386)/bin/sbcl: sbcl/version.lisp-expr
-	(cd sbcl && sh clean.sh && sh make.sh && \
-	 (cd doc && sh make-doc.sh) && \
+$(SBCL_I386)/bin/sbcl: \
+	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
+	@echo Building SBCL again!
+	(cd sbcl && sh clean.sh && \
+	 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib \
+	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH) sh make.sh && \
+	 (test ! -x $(shell which latex) || \
+		(cd sbcl/doc && sh make-doc.sh && cd manual && make)); \
 	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) && \
 	 INSTALL_ROOT=$(SBCL_I386) sh install.sh)
 
-build/sbcl/sbcl: $(SBCL_I386)/bin/sbcl $(SBCL_X86_64)/bin/sbcl
+build/sbcl/sbcl:
 	if [   -f sbcl-$(SBCL_VER)-ppc.tar.bz2 -a \
 	     ! -d $(SBCL_PPC) ]; then \
 	    tar xvjf sbcl-$(SBCL_VER)-ppc.tar.bz2; \
 	fi
 	if [ -x $(SBCL_PPC)/bin/sbcl ]; then \
+	    if [ -x $(SBCL_X86_64)/bin/sbcl ]; then \
+		lipo -create \
+		    -arch x86_64 $(SBCL_X86_64)/bin/sbcl \
+		    -arch i386   $(SBCL_I386)/bin/sbcl \
+		    -arch ppc    $(SBCL_PPC)/bin/sbcl \
+		    -output $@; \
+	    else \
+		lipo -create \
+		    -arch i386   $(SBCL_I386)/bin/sbcl \
+		    -arch ppc    $(SBCL_PPC)/bin/sbcl \
+		    -output $@; \
+	    fi; \
+	elif [ -x $(SBCL_X86_64)/bin/sbcl ]; then \
 	    lipo -create \
 		-arch x86_64 $(SBCL_X86_64)/bin/sbcl \
 		-arch i386   $(SBCL_I386)/bin/sbcl \
-		-arch ppc    $(SBCL_PPC)/bin/sbcl \
 		-output $@; \
 	else \
-	    lipo -create \
-		-arch x86_64 $(SBCL_X86_64)/bin/sbcl \
-		-arch i386   $(SBCL_I386)/bin/sbcl \
-		-output $@; \
+	    ln -f $(SBCL_I386)/bin/sbcl $@; \
 	fi
 
 $(SBCL_PPC_CORE): $(SBCL_PPC)/bin/sbcl bootstrap.lisp
@@ -138,8 +206,7 @@ $(SBCL_I386_CORE): $(SBCL_I386)/bin/sbcl bootstrap.lisp
 		--load bootstrap.lisp
 	mv sbcl.core-with-slime $@
 
-# Building the i386 core is preceded by building the x86_64 core
-sbcl-i386-core: $(SBCL_I386_CORE) sbcl-x86_64-core
+sbcl-i386-core: $(SBCL_I386_CORE)
 
 ppc-tarball: sbcl-ppc-core
 	tar cvjf sbcl-$(SBCL_VER)-ppc.tar.bz2 build/sbcl/ppc
@@ -172,10 +239,12 @@ slime/slime.elc: slime/slime.el
 		-batch -f batch-byte-compile $$file; \
 	done
 
-slime-doc: slime/doc/slime.pdf
-	(cd slime/doc; make)
+slime/doc/slime.pdf: slime/doc/slime.texi
+	test ! -x $(shell which latex) || (cd slime/doc; make)
 
-slime-build: slime/slime.elc #slime-doc
+slime-doc: slime/doc/slime.pdf
+
+slime-build: slime/slime.elc slime-doc
 
 ######################################################################
 
@@ -282,28 +351,6 @@ hyperspec: doc/html/HyperSpec
 
 APP=/tmp/Ready Lisp/Ready Lisp.app
 
-build/ReadyLisp-$(VERSION).dmg:
-	rm -fr /tmp/Ready\ Lisp
-	mkdir /tmp/Ready\ Lisp
-	mkdir /tmp/Ready\ Lisp/.background
-	cp -p dist/image.png /tmp/Ready\ Lisp/.background
-	cp -p dist/DS_Store /tmp/Ready\ Lisp/.DS_Store
-	rsync -aE aquamacs/"$(AQUA_APP)"/ "$(APP)"/
-	rsync -a --delete slime/ \
-		"$(APP)"/Contents/Resources/site-lisp/edit-modes/slime/
-	rsync -av site-lisp/ "$(APP)"/Contents/Resources/site-lisp/
-	patch -p0 -d "$(APP)"/Contents/Resources < site-lisp/site-start.patch
-	rsync -av --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
-		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
-	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
-	rsync -av systems/ "$(APP)"/Contents/Resources/sbcl/systems/
-	chmod -R go+rX /tmp/Ready\ Lisp
-	(cd /tmp/Ready\ Lisp; ln -s /Applications .)
-	(cd /tmp; \
-	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
-		ReadyLisp-$(VERSION).dmg)
-	mv /tmp/ReadyLisp-$(VERSION).dmg build
-
 copy-docs:
 	cp -p README NEWS /tmp/Ready\ Lisp
 	cp -p slime/doc/slime.info* "$(APP)"/Contents/Resources/info/
@@ -331,6 +378,29 @@ copy-docs:
 		"$(APP)"/Contents/Resources/html
 	chflags hidden /tmp/Ready\ Lisp/README
 	chflags hidden /tmp/Ready\ Lisp/NEWS
+
+build/ReadyLisp-$(VERSION).dmg:
+	rm -fr /tmp/Ready\ Lisp
+	mkdir /tmp/Ready\ Lisp
+	mkdir /tmp/Ready\ Lisp/.background
+	cp -p dist/image.png /tmp/Ready\ Lisp/.background
+	cp -p dist/DS_Store /tmp/Ready\ Lisp/.DS_Store
+	rsync -aE aquamacs/"$(AQUA_APP)"/ "$(APP)"/
+	rsync -a --delete slime/ \
+		"$(APP)"/Contents/Resources/site-lisp/edit-modes/slime/
+	rsync -av site-lisp/ "$(APP)"/Contents/Resources/site-lisp/
+	patch -p0 -d "$(APP)"/Contents/Resources < site-lisp/site-start.patch
+	rsync -av --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
+		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
+	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
+	rsync -av systems/ "$(APP)"/Contents/Resources/sbcl/systems/
+	test ! -x $(shell which latex) || make copy-docs
+	chmod -R go+rX /tmp/Ready\ Lisp
+	(cd /tmp/Ready\ Lisp; ln -s /Applications .)
+	(cd /tmp; \
+	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
+		ReadyLisp-$(VERSION).dmg)
+	mv /tmp/ReadyLisp-$(VERSION).dmg build
 
 disk-image: build/ReadyLisp-$(VERSION).dmg
 
