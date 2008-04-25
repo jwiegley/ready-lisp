@@ -7,12 +7,12 @@ VERSION	       = $(shell date +%Y%m%d)
 SBCL_VER       = $(shell ./sbcl-ver)
 SLIME_VER      = $(shell ./slime-ver)
 
-AQUA_VER       = 1.3b		# Aqumacs Emacs
+AQUA_VER       = 1.3b
 
-CL_FAD_VER     = 0.6.2		# CL-FAD
-CL_PPCRE_VER   = 1.3.2		# CL-PPCRE
-LOCAL_TIME_VER = 0.9.3		# LOCAL-TIME
-SERIES_VER     = 2.2.9		# SERIES
+CL_FAD_VER     = 0.6.2
+CL_PPCRE_VER   = 1.3.2
+LOCAL_TIME_VER = 0.9.3
+SERIES_VER     = 2.2.9
 
 ######################################################################
 
@@ -187,7 +187,7 @@ site/$(CL_FAD_TGZ):
 	@test -d site || mkdir site
 	curl -Lo $@ $(CL_FAD_TGZ_URL)
 
-site/cl-fad-$(CL_FAD_VER): site site/$(CL_FAD_TGZ)
+site/cl-fad-$(CL_FAD_VER): site/$(CL_FAD_TGZ)
 	(cd site; tar xvzf $(CL_FAD_TGZ))
 
 cl-fad: site/cl-fad-$(CL_FAD_VER)
@@ -202,7 +202,7 @@ site/$(CL_PPCRE_TGZ):
 	@test -d site || mkdir site
 	curl -Lo $@ $(CL_PPCRE_TGZ_URL)
 
-site/cl-ppcre-$(CL_PPCRE_VER): site site/$(CL_PPCRE_TGZ)
+site/cl-ppcre-$(CL_PPCRE_VER): site/$(CL_PPCRE_TGZ)
 	(cd site; tar xvzf $(CL_PPCRE_TGZ))
 
 cl-ppcre: site/cl-ppcre-$(CL_PPCRE_VER)
@@ -217,7 +217,7 @@ site/$(LOCAL_TIME_TGZ):
 	@test -d site || mkdir site
 	curl -Lo $@ $(LOCAL_TIME_TGZ_URL)
 
-site/local-time-$(LOCAL_TIME_VER): site site/$(LOCAL_TIME_TGZ)
+site/local-time-$(LOCAL_TIME_VER): site/$(LOCAL_TIME_TGZ)
 	(cd site; tar xvzf $(LOCAL_TIME_TGZ))
 
 local-time: site/local-time-$(LOCAL_TIME_VER)
@@ -232,7 +232,7 @@ site/$(SERIES_TBZ):
 	@test -d site || mkdir site
 	curl -Lo $@ $(SERIES_TBZ_URL)
 
-site/series-$(SERIES_VER): site site/$(SERIES_TBZ)
+site/series-$(SERIES_VER): site/$(SERIES_TBZ)
 	(cd site; tar xvjf $(SERIES_TBZ))
 
 series: site/series-$(SERIES_VER)
