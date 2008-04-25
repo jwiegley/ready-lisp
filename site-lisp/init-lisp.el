@@ -160,58 +160,100 @@
 
 (setenv "SBCL_HOME" *sbcl-lib-path*)
 
-(let ((load-file-path ))
-  (eval
-   `(defun slime-reconfig-load-path ()
-      (slime-eval-async
-       '(cl:prog1
-	 cl:nil
-	 (cl:setf swank-loader:*source-directory*
-		  ,(expand-file-name "site-lisp/edit-modes/slime/"
-				     *ready-lisp-resources-path*)
-		  swank::*load-path*
-		  '(,(expand-file-name "site-lisp/edit-modes/slime/contrib/"
-				       *ready-lisp-resources-path*))
+;; jww (2008-04-25): Ok, the following really needs some explanation; even if
+;; you understand it perfectly (you nimble CL hacker you), I'm going to need
+;; to remember what this does a few months or years from now...
+;;
+;; The problem being addressed here is that Ready Lisp pre-binds libraries
+;; like SLIME into the SBCL core file, in the interests of first-time load
+;; speed.  Mainly because first impressions are important enough to be worth
+;; this extra effort.
+;;
+;; But while this work greats, SBCL and SLIME can't handle it if you relocate
+;; the new core to a machine that doesn't have the same environment
+;; (pathnames, etc).  I built Ready Lisp in a particular place; you as the
+;; user probably aren't going to run it from that same place; this will cause
+;; disjunction between the baked pathnames in the core file and your system.
+;; The end result of all this is that asdf-install will fail to work, pretty
+;; cryptically too.
+;;
+;; The answer is to dynamically rewrite the pathnames that are loaded from the
+;; core file!  Yes, this is a total hack, but the alternative is to load and
+;; compile all the Lisp sources that Ready Lisp depends on at load time.  Not
+;; only would this be slow, but the output generated would be confusing as
+;; hell to someone who's not familiar with Common Lisp already.
+;;
+;; So I define this function, `slime-reconfig-load-path', which gets attached
+;; to `slime-connected-hook' to run once SLIME is able to talk to the SBCL
+;; inferior process.  This defun is wrapped in an `eval' form because we need
+;; to insert the pathnames that were determined just above, such as
+;; `*sbcl-source-path*', etc.
+;;
+;; This function simply calls `slime-eval-async' at the first opportunity, in
+;; order to pass a Common Lisp form down to SBCL.  That form changes the
+;; follow special variables:
+;;
+;;   swank-loader:*source-directory*
+;;   swank::*load-path*
+;;   <path translations for logical host SYS>
+;;   <paths found in asdf::*defined-systems*>
+;;
+;; All of these variables and definitions are being changed to relocate to the
+;; Ready Lisp application's Resources directory (and sub-directories beneath
+;; it), no matter where the user happens to install Ready Lisp.  You can even
+;; run it straight from the disk image!
 
-		  (sb-impl::logical-host-translations
-		   (sb-impl::find-logical-host "SYS"))
-		  (cl:list
-		   (cl:list
-		    "SYS:SRC;**;*.*.*"
-		    (cl:pathname ,(concat *sbcl-source-path* "/src/**/*.*")))
-		   (cl:list
-		    "SYS:CONTRIB;**;*.*.*"
-		    (cl:pathname ,(concat *sbcl-source-path* "/contrib/**/*.*"))))
+(eval
+ `(defun slime-reconfig-load-path ()
+    (slime-eval-async
+     '(cl:prog1
+       cl:nil
+       (cl:setf swank-loader:*source-directory*
+		,(expand-file-name "site-lisp/edit-modes/slime/"
+				   *ready-lisp-resources-path*)
+		swank::*load-path*
+		'(,(expand-file-name "site-lisp/edit-modes/slime/contrib/"
+				     *ready-lisp-resources-path*))
 
-		  (sb-impl::logical-host-canon-transls
-		   (sb-impl::find-logical-host "SYS"))
-		  (cl:list
-		   (cl:list
-		    (cl:pathname "SYS:SRC;**;*.*.*")
-		    (cl:pathname ,(concat *sbcl-source-path* "/src/**/*.*")))
-		   (cl:list
-		    (cl:pathname "SYS:CONTRIB;**;*.*.*")
-		    (cl:pathname ,(concat *sbcl-source-path* "/contrib/**/*.*")))))
+		(sb-impl::logical-host-translations
+		 (sb-impl::find-logical-host "SYS"))
+		(cl:list
+		 (cl:list
+		  "SYS:SRC;**;*.*.*"
+		  (cl:pathname ,(concat *sbcl-source-path* "/src/**/*.*")))
+		 (cl:list
+		  "SYS:CONTRIB;**;*.*.*"
+		  (cl:pathname ,(concat *sbcl-source-path* "/contrib/**/*.*"))))
 
-	 (cl:maphash
-	  (cl:lambda
-	   (key value)
-	   (cl:declare (cl:ignore key))
-	   (cl:let ((component
-		     (cl:car
-		      (cl:last (cl:pathname-directory
-				(asdf::component-relative-pathname (cl:cdr value))))))
-		    (site-modules (quote ,(nthcdr 2 (directory-files *sbcl-site-path*)))))
-		   (cl:setf (cl:slot-value (cl:cdr value) 'asdf::relative-pathname)
-			    (cl:pathname
-			     (cl:concatenate
-			      'cl:string
-			      (cl:if (cl:member component site-modules
-						:test (cl:symbol-function 'cl:string=))
-				     ,*sbcl-site-path*
-				     ,*sbcl-lib-path*)
-			      component "/")))))
-	  asdf::*defined-systems*))))))
+		(sb-impl::logical-host-canon-transls
+		 (sb-impl::find-logical-host "SYS"))
+		(cl:list
+		 (cl:list
+		  (cl:pathname "SYS:SRC;**;*.*.*")
+		  (cl:pathname ,(concat *sbcl-source-path* "/src/**/*.*")))
+		 (cl:list
+		  (cl:pathname "SYS:CONTRIB;**;*.*.*")
+		  (cl:pathname ,(concat *sbcl-source-path* "/contrib/**/*.*")))))
+
+       (cl:maphash
+	(cl:lambda
+	 (key value)
+	 (cl:declare (cl:ignore key))
+	 (cl:let ((component
+		   (cl:car
+		    (cl:last (cl:pathname-directory
+			      (asdf::component-relative-pathname (cl:cdr value))))))
+		  (site-modules (quote ,(nthcdr 2 (directory-files *sbcl-site-path*)))))
+		 (cl:setf (cl:slot-value (cl:cdr value) 'asdf::relative-pathname)
+			  (cl:pathname
+			   (cl:concatenate
+			    'cl:string
+			    (cl:if (cl:member component site-modules
+					      :test (cl:symbol-function 'cl:string=))
+				   ,*sbcl-site-path*
+				   ,*sbcl-lib-path*)
+			    component "/")))))
+	asdf::*defined-systems*)))))
 
 (add-hook 'slime-connected-hook 'slime-reconfig-load-path)
 
