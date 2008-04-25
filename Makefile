@@ -305,7 +305,7 @@ dist/ReadyLisp-$(VERSION).dmg:
 		ReadyLisp-$(VERSION).dmg)
 	mv /tmp/ReadyLisp-$(VERSION).dmg build
 
-dist: dist/ReadyLisp-$(VERSION).dmg
+disk-image: dist/ReadyLisp-$(VERSION).dmg
 
 dist2:
 	rm -fr /tmp/Ready\ Lisp
