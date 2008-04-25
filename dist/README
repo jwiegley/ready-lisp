@@ -1,0 +1,28 @@
+The files in this directory are used for building the Ready Lisp disk image
+(ReadyLisp.dmg).
+
+If any of the component versions are updated, then Background.graffle should
+be edited (with OmniGraffle), and the resulting image re-exported.  Here are
+the steps that I use:
+
+ 1. Open Background.graffle with OmniGraffle.  It was created with
+    OmniGraffle Professional 5.
+
+ 2. Edit the version numbers as needed.
+
+ 3. Make sure nothing is selected.
+
+ 4. Choose menu option: File | Export... (Cmd-Opt-E)
+
+ 5. Export the image to "dist/image.png" with the following settings:
+
+    First, uncheck everything.
+
+    Format:             PNG bitmap image
+    Scale:              100%
+    Bitmap Resolution:  72 dots per inch
+
+ 6. Once the file is saved, you can exit OmniGraffle.  Nothing more
+    needs to be done except to run "make", or "make disk-image" if you
+    already did a make but then realized you forgot to update the
+    background image (it happens!).
