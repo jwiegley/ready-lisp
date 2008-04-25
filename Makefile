@@ -276,6 +276,9 @@ dmg:
 	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
 	rsync -av systems/ "$(APP)"/Contents/Resources/sbcl/systems/
 	chmod -R go+rX /tmp/Ready\ Lisp
+	chflags hidden /tmp/Ready\ Lisp/README
+	chflags hidden /tmp/Ready\ Lisp/NEWS
+	(cd /tmp/Ready\ Lisp; ln -s /Applications .)
 	(cd /tmp; \
 	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
 		ReadyLisp-$(VERSION).dmg)
@@ -320,6 +323,9 @@ dist2:
 		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
 	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
 	chmod -R go+rX /tmp/Ready\ Lisp
+	chflags hidden /tmp/Ready\ Lisp/README
+	chflags hidden /tmp/Ready\ Lisp/NEWS
+	(cd /tmp/Ready\ Lisp; ln -s /Applications .)
 	(cd /tmp; \
 	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
 		ReadyLisp-$(VERSION).dmg)
