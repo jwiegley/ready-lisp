@@ -16,7 +16,7 @@ SBCL_I386_CORE   = $(SBCL_I386_LIB)/sbcl.core-with-slime
 SBCL_X86_64_CORE = $(SBCL_X86_64_LIB)/sbcl.core-with-slime
 SBCL_PPC_CORE    = $(SBCL_PPC_LIB)/sbcl.core-with-slime
 
-all: dependencies sbcl slime-build site-lisp-elc dist
+all: dependencies sbcl slime-build site-lisp-elc disk-image
 
 ######################################################################
 
@@ -65,14 +65,10 @@ $(SBCL_PPC)/bin/sbcl: sbcl-git
 	 rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) && \
 	 INSTALL_ROOT=$(SBCL_PPC) sh install.sh)
 
-sbcl-ppc: $(SBCL_PPC)/bin/sbcl
-
 $(SBCL_X86_64)/bin/sbcl: sbcl/version.lisp-expr
 	(cd sbcl && sh clean.sh && SBCL_ARCH=x86-64 sh make.sh && \
 	 rm -fr $(SBCL_X86_64) && mkdir -p $(SBCL_X86_64) && \
 	 INSTALL_ROOT=$(SBCL_X86_64) sh install.sh)
-
-sbcl-x86_64: $(SBCL_X86_64)/bin/sbcl
 
 $(SBCL_I386)/bin/sbcl: sbcl/version.lisp-expr
 	(cd sbcl && sh clean.sh && sh make.sh && \
@@ -80,9 +76,7 @@ $(SBCL_I386)/bin/sbcl: sbcl/version.lisp-expr
 	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) && \
 	 INSTALL_ROOT=$(SBCL_I386) sh install.sh)
 
-sbcl-i386: $(SBCL_I386)/bin/sbcl
-
-build/sbcl/sbcl: sbcl-$(shell uname -p)
+build/sbcl/sbcl: $(SBCL_I386)/bin/sbcl $(SBCL_X86_64)/bin/sbcl
 	if [   -f sbcl-$(SBCL_VER)-ppc.tar.bz2 -a \
 	     ! -d $(SBCL_PPC) ]; then \
 	    tar xvjf sbcl-$(SBCL_VER)-ppc.tar.bz2; \
@@ -100,7 +94,7 @@ build/sbcl/sbcl: sbcl-$(shell uname -p)
 		-output $@; \
 	fi
 
-$(SBCL_PPC_CORE): sbcl-ppc bootstrap.lisp
+$(SBCL_PPC_CORE): $(SBCL_PPC)/bin/sbcl bootstrap.lisp
 	find slime site -name '*.fasl' -delete
 	rm -fr ~/.slime
 	SBCL_HOME=$(SBCL_PPC_LIB) $(SBCL_PPC)/bin/sbcl \
@@ -108,7 +102,7 @@ $(SBCL_PPC_CORE): sbcl-ppc bootstrap.lisp
 		--load bootstrap.lisp
 	mv sbcl.core-with-slime $@
 
-$(SBCL_X86_64_CORE): sbcl-x86_64 bootstrap.lisp
+$(SBCL_X86_64_CORE): $(SBCL_X86_64)/bin/sbcl bootstrap.lisp
 	find slime site -name '*.fasl' -delete
 	rm -fr ~/.slime
 	SBCL_HOME=$(SBCL_X86_64_LIB) $(SBCL_X86_64)/bin/sbcl \
@@ -118,7 +112,7 @@ $(SBCL_X86_64_CORE): sbcl-x86_64 bootstrap.lisp
 
 sbcl-x86_64-core: $(SBCL_X86_64_CORE)
 
-$(SBCL_I386_CORE): sbcl-i386 bootstrap.lisp
+$(SBCL_I386_CORE): $(SBCL_I386)/bin/sbcl bootstrap.lisp
 	find slime site -name '*.fasl' -delete
 	rm -fr ~/.slime
 	SBCL_HOME=$(SBCL_I386_LIB) $(SBCL_I386)/bin/sbcl \
@@ -163,7 +157,7 @@ slime/slime.elc: slime/slime.el
 slime-doc: slime/doc/slime.pdf
 	(cd slime/doc; make)
 
-slime-build: slime/slime.elc slime-doc
+slime-build: slime/slime.elc #slime-doc
 
 ######################################################################
 
@@ -237,9 +231,8 @@ systems:
 
 ######################################################################
 
-site-lisp-elc:
-	find site-lisp -name '*.el' ! -name init-lisp.el -type f | \
-	while read file; do \
+site-lisp-elc: site-lisp/cldoc.el site-lisp/paredit.el site-lisp/redshank.el
+	echo $? | while read file; do \
 	    EMACSDATA="$(RESOURCES)/etc" \
 	    EMACSDOC="$(RESOURCES)/etc" \
 	    EMACSPATH="$(RESOURCES)/libexec" \
@@ -249,7 +242,7 @@ site-lisp-elc:
 		-L "$(RESOURCES)"/lisp/emacs-lisp \
 		-L "$(RESOURCES)"/lisp/progmodes \
 		-L "$(RESOURCES)"/lisp/net \
-		-L site-lisp \
+		-L site-lisp -l slime/slime.elc \
 		--eval '(setq byte-compile-warnings nil)' \
 		-batch -f batch-byte-compile $$file; \
 	done
@@ -258,7 +251,7 @@ site-lisp-elc:
 
 APP=/tmp/Ready Lisp/Ready Lisp.app
 
-dmg:
+disk-image:
 	rm -fr /tmp/Ready\ Lisp
 	mkdir /tmp/Ready\ Lisp
 	mkdir /tmp/Ready\ Lisp/.background
@@ -322,6 +315,7 @@ dist2:
 	rsync -av --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
 		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
 	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
+	rsync -av systems/ "$(APP)"/Contents/Resources/sbcl/systems/
 	chmod -R go+rX /tmp/Ready\ Lisp
 	chflags hidden /tmp/Ready\ Lisp/README
 	chflags hidden /tmp/Ready\ Lisp/NEWS
