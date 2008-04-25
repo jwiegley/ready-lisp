@@ -133,7 +133,6 @@ $(SBCL_PPC)/bin/sbcl: \
 
 $(SBCL_X86_64)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
-	@echo Building SBCL for X86_64 again!
 	(cd sbcl && sh clean.sh && \
 	 SBCL_ARCH=x86-64 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib \
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH) sh make.sh && \
@@ -144,7 +143,6 @@ $(SBCL_X86_64)/bin/sbcl: \
 
 $(SBCL_I386)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
-	@echo Building SBCL again!
 	(cd sbcl && sh clean.sh && \
 	 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib \
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH) sh make.sh && \
