@@ -70,7 +70,8 @@ apply-patches: site-lisp/site-start.patch
 SBCL_GIT=git://sbcl.boinkor.net/sbcl.git
 
 sbcl-git:
-	@test -d sbcl || git clone $(SBCL_GIT)
+	@test -f sbcl/version.lisp-expr || \
+		(rm -fr sbcl; git clone $(SBCL_GIT))
 
 sbcl/version.lisp-expr: sbcl-git
 
@@ -150,7 +151,7 @@ sbcl: sbcl-$(shell uname -p)-core build/sbcl/sbcl
 SLIME_GIT=git://github.com/nablaone/slime.git
 
 slime-git:
-	@test -d slime || git clone $(SLIME_GIT)
+	@test -f slime/slime.el || (rm -fr slime; git clone $(SLIME_GIT))
 
 slime/slime.elc: slime/slime.el
 	find slime -name '*.el' -type f | \
@@ -285,7 +286,6 @@ build/ReadyLisp-$(VERSION).dmg:
 	rm -fr /tmp/Ready\ Lisp
 	mkdir /tmp/Ready\ Lisp
 	mkdir /tmp/Ready\ Lisp/.background
-	cp -p README NEWS /tmp/Ready\ Lisp
 	cp -p dist/image.png /tmp/Ready\ Lisp/.background
 	cp -p dist/DS_Store /tmp/Ready\ Lisp/.DS_Store
 	rsync -aE aquamacs/"$(AQUA_APP)"/ "$(APP)"/
@@ -293,37 +293,22 @@ build/ReadyLisp-$(VERSION).dmg:
 		"$(APP)"/Contents/Resources/site-lisp/edit-modes/slime/
 	rsync -av site-lisp/ "$(APP)"/Contents/Resources/site-lisp/
 	patch -p0 -d "$(APP)"/Contents/Resources < site-lisp/site-start.patch
-	patch -p1 -d "$(APP)"/Contents/Resources < doc/info/dir.patch
 	rsync -av --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
 		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
 	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
 	rsync -av systems/ "$(APP)"/Contents/Resources/sbcl/systems/
 	chmod -R go+rX /tmp/Ready\ Lisp
-	chflags hidden /tmp/Ready\ Lisp/README
-	chflags hidden /tmp/Ready\ Lisp/NEWS
 	(cd /tmp/Ready\ Lisp; ln -s /Applications .)
 	(cd /tmp; \
 	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
 		ReadyLisp-$(VERSION).dmg)
 	mv /tmp/ReadyLisp-$(VERSION).dmg build
 
-disk-image: build/ReadyLisp-$(VERSION).dmg
-
-dist2:
-	rm -fr /tmp/Ready\ Lisp
-	mkdir /tmp/Ready\ Lisp
-	mkdir /tmp/Ready\ Lisp/.background
+copy-docs:
 	cp -p README NEWS /tmp/Ready\ Lisp
-	cp -p dist/image.png /tmp/Ready\ Lisp/.background
-	cp -p dist/DS_Store /tmp/Ready\ Lisp/.DS_Store
-	rsync -aE aquamacs/"$(AQUA_APP)"/ "$(APP)"/
-	rsync -a --delete slime/ \
-		"$(APP)"/Contents/Resources/site-lisp/edit-modes/slime/
-	rsync -av site-lisp/ "$(APP)"/Contents/Resources/site-lisp/
 	cp -p slime/doc/slime.info* "$(APP)"/Contents/Resources/info/
 	cp -p doc/info/ansi* "$(APP)"/Contents/Resources/info/
 	cp -p $(SBCL_I386)/share/info/*.info* "$(APP)"/Contents/Resources/info/
-	patch -p0 -d "$(APP)"/Contents/Resources < site-lisp/site-start.patch
 	patch -p1 -d "$(APP)"/Contents/Resources < doc/info/dir.patch
 	rsync -av $(SBCL_I386)/share/man/ "$(APP)"/Contents/Resources/man/
 	mkdir Ready\ Lisp.app/Contents/Resources/pdf/
@@ -344,24 +329,18 @@ dist2:
 		"$(APP)"/Contents/Resources/html
 	mv "$(APP)"/Contents/Resources/Emacs\ Manual \
 		"$(APP)"/Contents/Resources/html
-	rsync -av --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
-		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
-	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
-	rsync -av systems/ "$(APP)"/Contents/Resources/sbcl/systems/
-	chmod -R go+rX /tmp/Ready\ Lisp
 	chflags hidden /tmp/Ready\ Lisp/README
 	chflags hidden /tmp/Ready\ Lisp/NEWS
-	(cd /tmp/Ready\ Lisp; ln -s /Applications .)
-	(cd /tmp; \
-	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
-		ReadyLisp-$(VERSION).dmg)
-	mv /tmp/ReadyLisp-$(VERSION).dmg build
+
+disk-image: build/ReadyLisp-$(VERSION).dmg
 
 clean:
 	rm -fr build *.dmg
 	test ! -d slime || find slime -name '*.fasl' -delete
 	test ! -d slime || find slime -name '*.elc' -delete
 	find site-lisp -name '*.elc' -delete
+	test ! -d sbcl || (cd sbcl; sh clean.sh)
+	test ! -d slime/doc || (cd slime/doc; make clean)
 
 scour: clean
 	rm -fr aquamacs sbcl slime systems site
