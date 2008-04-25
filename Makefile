@@ -390,6 +390,9 @@ build/ReadyLisp-$(VERSION).dmg:
 	patch -p0 -d "$(APP)"/Contents/Resources < site-lisp/site-start.patch
 	rsync -av --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
 		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
+	rsync -av --exclude=doc/ --exclude=obj/ --exclude=output/ \
+		--exclude=tests/ --exclude=tools-for-build/ \
+		sbcl/ "$(APP)"/Contents/Resources/sbcl/source/
 	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
 	rsync -av systems/ "$(APP)"/Contents/Resources/sbcl/systems/
 	test ! -x $(shell which latex) || make copy-docs
