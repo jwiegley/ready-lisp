@@ -16,7 +16,8 @@ SBCL_PPC_BOOTSTRAP_VER = 1.0.2
 
 # This version is from aquamacs.org.
 
-AQUA_VER = 1.3b
+AQUA_VER            = 1.3b
+SBCL_RELEASE_BRANCH = sbcl_1_0_16
 
 # These versions should much more rarely.  Here are the URLs where you can
 # check for the latest:
@@ -87,8 +88,9 @@ apply-patches: site-lisp/site-start.patch
 SBCL_GIT=git://sbcl.boinkor.net/sbcl.git
 
 sbcl/version.lisp-expr:
-	@test -f sbcl/version.lisp-expr ||		\
-		(rm -fr sbcl; git clone $(SBCL_GIT))
+	@test -f sbcl/version.lisp-expr ||			\
+		(rm -fr sbcl; git clone $(SBCL_GIT) &&		\
+		 cd sbcl && git checkout $(SBCL_RELEASE_BRANCH))
 
 sbcl-git: sbcl/version.lisp-expr
 
