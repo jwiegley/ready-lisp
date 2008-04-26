@@ -173,7 +173,7 @@ sbcl-$(SBCL_VER)-ppc.tar.bz2:
 		--exclude=/sbcl/obj/				\
 		--exclude=/build/				\
 		--exclude=/aquamacs/				\
-		--exclude=/sbcl/doc/				\
+		--exclude=/doc/					\
 		--exclude=/sbcl/output/				\
 		--exclude=/sbcl/tests/				\
 		--exclude=/slime/				\
