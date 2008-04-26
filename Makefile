@@ -162,7 +162,7 @@ sbcl-$(SBCL_VER)-ppc.tar.bz2:
 	if [ "$(PPC_HOST)" = "" ]; then				\
 	    if [ "$(ARCH)" = "powerpc" ]; then			\
 		make $(SBCL_PPC_CORE) &&			\
-		tar cvjf $@ build/sbcl/ppc;			\
+		tar cjf $@ build/sbcl/ppc;			\
 	    fi;							\
 	else							\
 	    rsync -e ssh -av --delete				\
