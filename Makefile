@@ -104,7 +104,7 @@ $(SBCL_BOOTSTRAP_TBZ):
 	curl -Lo $@ $(SBCL_BOOTSTRAP_TBZ_URL)
 
 $(SBCL_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_BOOTSTRAP_TBZ)
-	tar xvjf $(SBCL_BOOTSTRAP_TBZ)
+	tar xjf $(SBCL_BOOTSTRAP_TBZ)
 	ln -f $(SBCL_BOOTSTRAP)/output/sbcl.core $(SBCL_BOOTSTRAP)/contrib
 	touch $(SBCL_BOOTSTRAP)/src/runtime/sbcl
 
@@ -112,7 +112,7 @@ $(SBCL_PPC_BOOTSTRAP_TBZ):
 	curl -Lo $@ $(SBCL_PPC_BOOTSTRAP_TBZ_URL)
 
 $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_PPC_BOOTSTRAP_TBZ)
-	tar xvjf $(SBCL_PPC_BOOTSTRAP_TBZ)
+	tar xjf $(SBCL_PPC_BOOTSTRAP_TBZ)
 	ln -f $(SBCL_PPC_BOOTSTRAP)/output/sbcl.core $(SBCL_PPC_BOOTSTRAP)/contrib
 	touch $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl
 
@@ -190,7 +190,7 @@ ppc-tarball: sbcl-$(SBCL_VER)-ppc.tar.bz2
 $(SBCL_PPC): sbcl-$(SBCL_VER)-ppc.tar.bz2
 	if [   -f sbcl-$(SBCL_VER)-ppc.tar.bz2 -a		\
 	     ! -d $(SBCL_PPC) ]; then				\
-	    tar xvjf sbcl-$(SBCL_VER)-ppc.tar.bz2;		\
+	    tar xjf sbcl-$(SBCL_VER)-ppc.tar.bz2;		\
 	fi
 
 build/sbcl/sbcl:
@@ -297,7 +297,7 @@ site/$(CL_FAD_TGZ):
 	curl -Lo $@ $(CL_FAD_TGZ_URL)
 
 site/cl-fad-$(CL_FAD_VER): site/$(CL_FAD_TGZ)
-	(cd site; tar xvzf $(CL_FAD_TGZ))
+	(cd site; tar xzf $(CL_FAD_TGZ))
 
 cl-fad: site/cl-fad-$(CL_FAD_VER)
 
@@ -312,7 +312,7 @@ site/$(CL_PPCRE_TGZ):
 	curl -Lo $@ $(CL_PPCRE_TGZ_URL)
 
 site/cl-ppcre-$(CL_PPCRE_VER): site/$(CL_PPCRE_TGZ)
-	(cd site; tar xvzf $(CL_PPCRE_TGZ))
+	(cd site; tar xzf $(CL_PPCRE_TGZ))
 
 cl-ppcre: site/cl-ppcre-$(CL_PPCRE_VER)
 
@@ -327,7 +327,7 @@ site/$(LOCAL_TIME_TGZ):
 	curl -Lo $@ $(LOCAL_TIME_TGZ_URL)
 
 site/local-time-$(LOCAL_TIME_VER): site/$(LOCAL_TIME_TGZ)
-	(cd site; tar xvzf $(LOCAL_TIME_TGZ))
+	(cd site; tar xzf $(LOCAL_TIME_TGZ))
 
 local-time: site/local-time-$(LOCAL_TIME_VER)
 
@@ -342,7 +342,7 @@ site/$(SERIES_TBZ):
 	curl -Lo $@ $(SERIES_TBZ_URL)
 
 site/series-$(SERIES_VER): site/$(SERIES_TBZ)
-	(cd site; tar xvjf $(SERIES_TBZ))
+	(cd site; tar xjf $(SERIES_TBZ))
 
 series: site/series-$(SERIES_VER)
 
@@ -382,7 +382,7 @@ doc/html/$(HYPERSPEC_TGZ):
 	curl -Lo $@ $(HYPERSPEC_TGZ_URL)
 
 doc/html/HyperSpec: doc/html/$(HYPERSPEC_TGZ)
-	(cd doc/html; tar xvzf $(HYPERSPEC_TGZ))
+	(cd doc/html; tar xzf $(HYPERSPEC_TGZ))
 	touch $@
 
 hyperspec: doc/html/HyperSpec
