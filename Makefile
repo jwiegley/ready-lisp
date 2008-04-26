@@ -223,8 +223,8 @@ build/sbcl/sbcl:
 sbcl-bin: build/sbcl/sbcl
 
 $(SBCL_PPC_CORE): $(SBCL_PPC)/bin/sbcl bootstrap.lisp
-	find slime site -name '*.fasl' -delete
-	rm -fr ~/.slime
+	-find slime site -name '*.fasl' -delete
+	-rm -fr ~/.slime
 	SBCL_HOME=$(SBCL_PPC_LIB) $(SBCL_PPC)/bin/sbcl	\
 		--core $(SBCL_PPC_LIB)/sbcl.core	\
 		--load bootstrap.lisp
