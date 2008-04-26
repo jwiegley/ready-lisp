@@ -2,6 +2,7 @@
 .DS_Store
 /aquamacs
 /build
+/my-build.sh
 /out
 /site
 /systems
