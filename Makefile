@@ -283,7 +283,8 @@ slime/slime.elc: slime/slime.el
 	done
 
 slime/doc/slime.pdf: slime/doc/slime.texi
-	test ! -x $(shell which latex) || (cd slime/doc; make)
+	test ! -x $(shell which latex) || \
+	    (cd slime/doc; make > slime-doc-log.txt 2>&1)
 
 slime-doc: slime/doc/slime.pdf
 
