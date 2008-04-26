@@ -4,8 +4,6 @@
 # server.  Note that paredit.el and redshank.el must be updated manually.
 
 VERSION	  = $(shell date +%Y%m%d)
-SBCL_VER  = $(shell ./sbcl-ver)
-SLIME_VER = $(shell ./slime-ver)
 ARCH	  = $(shell uname -p)
 
 # Go to sbcl.org and check the Downloads page to find out what versions these
@@ -16,7 +14,9 @@ SBCL_PPC_BOOTSTRAP_VER = 1.0.2
 
 # This version is from aquamacs.org.
 
-AQUA_VER            = 1.3b
+AQUA_VER  = 1.3b
+SBCL_VER  = 1.0.16
+
 SBCL_RELEASE_BRANCH = sbcl_1_0_16
 
 # These versions should much more rarely.  Here are the URLs where you can

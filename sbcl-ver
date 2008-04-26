@@ -1,2 +1,0 @@
-#!/bin/sh
-tail -1 sbcl/version.lisp-expr | sed 's/"//g'
