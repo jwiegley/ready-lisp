@@ -142,13 +142,13 @@ $(SBCL_X86_64)/bin/sbcl: \
 
 $(SBCL_I386)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
-	(cd sbcl && sh clean.sh &&						\
-	 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib				\
-	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH) sh make.sh &&	\
-	 sh make.sh > sbcl-i386-log.txt 2>&1 &&					\
-	 (test ! -x $(shell which latex) ||					\
-	     (cd doc && sh make-doc.sh && cd manual && make));			\
-	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) &&			\
+	(cd sbcl && sh clean.sh &&				\
+	 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib		\
+	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)	\
+	 sh make.sh > sbcl-i386-log.txt 2>&1 &&			\
+	 (test ! -x $(shell which latex) ||			\
+	     (cd doc && sh make-doc.sh && cd manual && make));	\
+	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) &&	\
 	 INSTALL_ROOT=$(SBCL_I386) sh install.sh)
 
 # This code allows me to build just the PowerPC dependent parts on another OS
@@ -164,9 +164,7 @@ sbcl-$(SBCL_VER)-ppc.tar.bz2:
 		tar cvjf $@ build/sbcl/ppc;			\
 	    fi;							\
 	else							\
-	    (ssh $(PPC_USER)@$(PPC_HOST)			\
-		test -d /tmp/ready-lisp/sbcl/src ||		\
-	     rsync -e ssh -av --delete				\
+	    rsync -e ssh -av --delete				\
 		--exclude=.git/					\
 		--exclude='/sbcl-*/'				\
 		--exclude=/sbcl/obj/				\
@@ -181,7 +179,7 @@ sbcl-$(SBCL_VER)-ppc.tar.bz2:
 		--exclude=/site-lisp/				\
 		--exclude=/dist/				\
 		--exclude='/sbcl*-x86-*.bz2'			\
-		./ $(PPC_USER)@$(PPC_HOST):/tmp/ready-lisp/) &&	\
+		./ $(PPC_USER)@$(PPC_HOST):/tmp/ready-lisp/ &&	\
 	    ssh $(PPC_USER)@$(PPC_HOST)				\
 		'(cd /tmp/ready-lisp; make ppc-tarball)' &&	\
 	    scp $(PPC_USER)@$(PPC_HOST):/tmp/ready-lisp/$@ .;	\
