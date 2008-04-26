@@ -107,7 +107,7 @@ $(SBCL_BOOTSTRAP_TBZ):
 
 $(SBCL_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_BOOTSTRAP_TBZ)
 	tar xvjf $(SBCL_BOOTSTRAP_TBZ)
-	mv $(SBCL_BOOTSTRAP)/output/sbcl.core $(SBCL_BOOTSTRAP)/contrib
+	ln -f $(SBCL_BOOTSTRAP)/output/sbcl.core $(SBCL_BOOTSTRAP)/contrib
 	touch $(SBCL_BOOTSTRAP)/src/runtime/sbcl
 
 $(SBCL_PPC_BOOTSTRAP_TBZ):
@@ -115,7 +115,7 @@ $(SBCL_PPC_BOOTSTRAP_TBZ):
 
 $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_PPC_BOOTSTRAP_TBZ)
 	tar xvjf $(SBCL_PPC_BOOTSTRAP_TBZ)
-	mv $(SBCL_PPC_BOOTSTRAP)/output/sbcl.core $(SBCL_PPC_BOOTSTRAP)/contrib
+	ln -f $(SBCL_PPC_BOOTSTRAP)/output/sbcl.core $(SBCL_PPC_BOOTSTRAP)/contrib
 	touch $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl
 
 # (cd tests; sh run-tests.sh); \
