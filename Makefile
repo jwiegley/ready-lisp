@@ -58,7 +58,7 @@ update:
 
 ######################################################################
 
-dependencies: aquamacs sbcl-git slime-git hyperspec \
+dependencies: aquamacs-app sbcl-git slime-git hyperspec \
 	cl-fad cl-ppcre local-time series systems
 
 ######################################################################
@@ -78,8 +78,6 @@ aquamacs-app: aquamacs/$(AQUA_DMG)
 	    (hdiutil attach aquamacs/$(AQUA_DMG) &&			\
 	    cp -R "/Volumes/Aquamacs Emacs/$(AQUA_APP)" aquamacs &&	\
 	    hdiutil detach /Volumes/Aquamacs\ Emacs)
-
-aquamacs: aquamacs-app
 
 apply-patches: site-lisp/site-start.patch
 	patch -N -p0 < site-lisp/site-start.patch
