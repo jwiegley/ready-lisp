@@ -122,6 +122,7 @@ $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_PPC_BOOTSTRAP_TBZ)
 
 $(SBCL_PPC)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl
+	@echo Building SBCL $(SBCL_VER) for powerpc, please wait ...
 	(cd sbcl && sh clean.sh &&				\
 	 SBCL_HOME=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/contrib		\
 	 PATH=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/src/runtime:$(PATH)	\
@@ -131,6 +132,7 @@ $(SBCL_PPC)/bin/sbcl: \
 
 $(SBCL_X86_64)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
+	@echo Building SBCL $(SBCL_VER) for x86-64, please wait ...
 	(cd sbcl && sh clean.sh &&					\
 	 SBCL_ARCH=x86-64 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib	\
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
@@ -142,6 +144,7 @@ $(SBCL_X86_64)/bin/sbcl: \
 
 $(SBCL_I386)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
+	@echo Building SBCL $(SBCL_VER) for i386, please wait ...
 	(cd sbcl && sh clean.sh &&				\
 	 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib		\
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)	\
