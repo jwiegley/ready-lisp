@@ -21,7 +21,7 @@ ssh $PPC_HOST rm -fr /tmp/ready-lisp
 if [[ $local == true ]]; then
     rsync -a ~/src/ready-lisp .
 else
-    git clone git://github.com/jwiegley/ready-lisp.git && \
+    git clone git://github.com/jwiegley/ready-lisp.git
 fi
 
 cd ready-lisp && \
