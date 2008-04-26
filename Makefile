@@ -181,7 +181,7 @@ sbcl-$(SBCL_VER)-ppc.tar.bz2:
 		--exclude=/systems/				\
 		--exclude=/site-lisp/				\
 		--exclude=/dist/				\
-		--exclude='/sbcl*-x86-*.bz2'			\
+		--exclude='/sbcl*.bz2'				\
 		./ $(PPC_USER)@$(PPC_HOST):/tmp/ready-lisp/ &&	\
 	    ssh $(PPC_USER)@$(PPC_HOST)				\
 		'(cd /tmp/ready-lisp; make ppc-tarball)' &&	\
