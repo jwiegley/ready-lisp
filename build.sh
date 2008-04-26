@@ -1,4 +1,10 @@
-#!/bin/sh
+#!/bin/bash
+
+local=false
+if [[ "$1" == "--local" ]]; then
+    local=true
+    shift 1
+fi
 
 PPC_HOST=$1
 
@@ -12,8 +18,13 @@ rm -fr ready-lisp
 
 ssh $PPC_HOST rm -fr /tmp/ready-lisp
 
-git clone git://github.com/jwiegley/ready-lisp.git && \
-    cd ready-lisp && \
+if [[ $local == true ]]; then
+    rsync -a ~/src/ready-lisp .
+else
+    git clone git://github.com/jwiegley/ready-lisp.git && \
+fi
+
+cd ready-lisp && \
     time make PPC_HOST=$PPC_HOST && \
     cp /tmp/ready-lisp/build/ReadyLisp-*.dmg .
 
