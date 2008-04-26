@@ -409,17 +409,17 @@ copy-docs:
 	rsync -a doc/html/HyperSpec "$(APP)"/Contents/Resources/html
 	rsync -a slime/doc/html/ "$(APP)"/Contents/Resources/html/slime/
 	rsync -a $(SBCL_I386)/share/doc/sbcl/html/asdf \
-		"$(APP)"/Contents/Resources/html
+	    "$(APP)"/Contents/Resources/html
 	rsync -a $(SBCL_I386)/share/doc/sbcl/html/sbcl \
-		"$(APP)"/Contents/Resources/html
+	    "$(APP)"/Contents/Resources/html
 	mv "$(APP)"/Contents/Resources/Aquamacs\ Help \
-		"$(APP)"/Contents/Resources/html
+	    "$(APP)"/Contents/Resources/html
 	mv "$(APP)"/Contents/Resources/Emacs\ Lisp\ Reference \
-		"$(APP)"/Contents/Resources/html
+	    "$(APP)"/Contents/Resources/html
 	mv "$(APP)"/Contents/Resources/elisp \
-		"$(APP)"/Contents/Resources/html
+	    "$(APP)"/Contents/Resources/html
 	mv "$(APP)"/Contents/Resources/Emacs\ Manual \
-		"$(APP)"/Contents/Resources/html
+	    "$(APP)"/Contents/Resources/html
 	chflags hidden /tmp/Ready\ Lisp/README
 	chflags hidden /tmp/Ready\ Lisp/NEWS
 
@@ -430,15 +430,16 @@ build/ReadyLisp-$(VERSION).dmg:
 	cp -p dist/image.png /tmp/Ready\ Lisp/.background
 	cp -p dist/DS_Store /tmp/Ready\ Lisp/.DS_Store
 	rsync -aE aquamacs/"$(AQUA_APP)"/ "$(APP)"/
-	rsync -a --delete slime/ \
-		"$(APP)"/Contents/Resources/site-lisp/edit-modes/slime/
+	rsync -a --delete --exclude=.git/ --exclude=doc/ --exclude='*-log.txt' \
+	    slime/ "$(APP)"/Contents/Resources/site-lisp/edit-modes/slime/
 	rsync -a site-lisp/ "$(APP)"/Contents/Resources/site-lisp/
 	patch -p0 -d "$(APP)"/Contents/Resources < site-lisp/site-start.patch
 	rsync -a --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
-		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
+	    build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
 	rsync -a --exclude=doc/ --exclude=obj/ --exclude=output/ \
-		--exclude=tests/ --exclude=tools-for-build/ \
-		sbcl/ "$(APP)"/Contents/Resources/sbcl/source/
+	    --exclude=tests/ --exclude=tools-for-build/ \
+	    --exclude=.git/ --exclude='*-log.txt' \
+	    sbcl/ "$(APP)"/Contents/Resources/sbcl/source/
 	rsync -a site/ "$(APP)"/Contents/Resources/sbcl/site/
 	rsync -a systems/ "$(APP)"/Contents/Resources/sbcl/systems/
 	test ! -x $(shell which latex) || make copy-docs
@@ -446,7 +447,7 @@ build/ReadyLisp-$(VERSION).dmg:
 	(cd /tmp/Ready\ Lisp; ln -s /Applications .)
 	(cd /tmp; \
 	 hdiutil create -format UDBZ -srcfolder Ready\ Lisp \
-		ReadyLisp-$(VERSION).dmg)
+	     ReadyLisp-$(VERSION).dmg)
 	mv /tmp/ReadyLisp-$(VERSION).dmg build
 
 disk-image: build/ReadyLisp-$(VERSION).dmg
