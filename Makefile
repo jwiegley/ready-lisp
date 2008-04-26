@@ -177,7 +177,6 @@ sbcl-$(SBCL_VER)-ppc.tar.bz2:
 		--exclude=/aquamacs/				\
 		--exclude=/doc/					\
 		--exclude=/sbcl/output/				\
-		--exclude=/sbcl/tests/				\
 		--exclude=/site-lisp/				\
 		--exclude=/dist/				\
 		--exclude='/sbcl*.bz2'				\
