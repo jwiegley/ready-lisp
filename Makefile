@@ -128,7 +128,8 @@ $(SBCL_PPC)/bin/sbcl: \
 	 PATH=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/src/runtime:$(PATH)	\
 	 sh make.sh > sbcl-ppc-log.txt 2>&1 &&			\
 	 rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) &&		\
-	 INSTALL_ROOT=$(SBCL_PPC) sh install.sh)
+	 INSTALL_ROOT=$(SBCL_PPC) \
+	 sh install.sh > sbcl-ppc-install-log.txt 2>&1 )
 
 $(SBCL_X86_64)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
@@ -137,22 +138,23 @@ $(SBCL_X86_64)/bin/sbcl: \
 	 SBCL_ARCH=x86-64 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib	\
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
 	 sh make.sh > sbcl-x86_64-log.txt 2>&1 &&			\
-	 (test ! -x $(shell which latex) ||				\
-	     (cd doc && sh make-doc.sh && cd manual && make));		\
 	 rm -fr $(SBCL_X86_64) && mkdir -p $(SBCL_X86_64) &&		\
-	 INSTALL_ROOT=$(SBCL_X86_64) sh install.sh)
+	 INSTALL_ROOT=$(SBCL_X86_64) \
+	 sh install.sh > sbcl-x86_64-install-log.txt 2>&1 )
 
 $(SBCL_I386)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
 	@echo Building SBCL $(SBCL_VER) for i386, please wait ...
-	(cd sbcl && sh clean.sh &&				\
-	 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib		\
-	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)	\
-	 sh make.sh > sbcl-i386-log.txt 2>&1 &&			\
-	 (test ! -x $(shell which latex) ||			\
-	     (cd doc && sh make-doc.sh && cd manual && make));	\
-	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) &&	\
-	 INSTALL_ROOT=$(SBCL_I386) sh install.sh)
+	(cd sbcl && sh clean.sh &&					\
+	 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib			\
+	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
+	 sh make.sh > sbcl-i386-log.txt 2>&1 &&				\
+	 (test ! -x $(shell which latex) ||				\
+	     (cd doc && sh make-doc.sh > sbcl-doc-log.txt 2>&1 &&	\
+	      cd manual && make > sbcl-manual-log.txt 2>&1 ));		\
+	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) &&		\
+	 INSTALL_ROOT=$(SBCL_I386)					\
+	 sh install.sh make > sbcl-i386-install-log.txt 2>&1 )
 
 # This code allows me to build just the PowerPC dependent parts on another OS
 # X box over SSH.
@@ -167,7 +169,7 @@ sbcl-$(SBCL_VER)-ppc.tar.bz2:
 		tar cjf $@ build/sbcl/ppc;			\
 	    fi;							\
 	else							\
-	    rsync -e ssh -av --delete				\
+	    rsync -e ssh -a --delete				\
 		--exclude=.git/					\
 		--exclude='/sbcl-*/'				\
 		--exclude=/sbcl/obj/				\
@@ -228,7 +230,7 @@ $(SBCL_PPC_CORE): $(SBCL_PPC)/bin/sbcl bootstrap.lisp
 	rm -fr ~/.slime
 	SBCL_HOME=$(SBCL_PPC_LIB) $(SBCL_PPC)/bin/sbcl	\
 		--core $(SBCL_PPC_LIB)/sbcl.core	\
-		--load bootstrap.lisp
+		--load bootstrap.lisp > sbcl-ppc-core-log.txt 2>&1
 	mv sbcl.core-with-slime $@
 
 sbcl-powerpc-core: $(SBCL_PPC_CORE)
@@ -238,7 +240,7 @@ $(SBCL_X86_64_CORE): $(SBCL_X86_64)/bin/sbcl bootstrap.lisp
 	rm -fr ~/.slime
 	SBCL_HOME=$(SBCL_X86_64_LIB) $(SBCL_X86_64)/bin/sbcl	\
 		--core $(SBCL_X86_64_LIB)/sbcl.core		\
-		--load bootstrap.lisp
+		--load bootstrap.lisp > sbcl-x86_64-core-log.txt 2>&1
 	mv sbcl.core-with-slime $@
 
 sbcl-x86_64-core: $(SBCL_X86_64_CORE)
@@ -248,7 +250,7 @@ $(SBCL_I386_CORE): $(SBCL_I386)/bin/sbcl bootstrap.lisp
 	rm -fr ~/.slime
 	SBCL_HOME=$(SBCL_I386_LIB) $(SBCL_I386)/bin/sbcl	\
 		--core $(SBCL_I386_LIB)/sbcl.core		\
-		--load bootstrap.lisp
+		--load bootstrap.lisp > sbcl-i386-core-log.txt 2>&1
 	mv sbcl.core-with-slime $@
 
 sbcl-i386-core: $(SBCL_I386_CORE)
@@ -399,16 +401,16 @@ copy-docs:
 	cp -p doc/info/ansi* "$(APP)"/Contents/Resources/info/
 	cp -p $(SBCL_I386)/share/info/*.info* "$(APP)"/Contents/Resources/info/
 	patch -p1 -d "$(APP)"/Contents/Resources < doc/info/dir.patch
-	rsync -av $(SBCL_I386)/share/man/ "$(APP)"/Contents/Resources/man/
+	rsync -a $(SBCL_I386)/share/man/ "$(APP)"/Contents/Resources/man/
 	mkdir "$(APP)"/Contents/Resources/pdf/
 	cp -p $(SBCL_I386)/share/doc/sbcl/*.pdf "$(APP)"/Contents/Resources/pdf/
 	cp -p slime/doc/*.pdf "$(APP)"/Contents/Resources/pdf/
 	mkdir "$(APP)"/Contents/Resources/html/
-	rsync -av doc/html/HyperSpec "$(APP)"/Contents/Resources/html
-	rsync -av slime/doc/html/ "$(APP)"/Contents/Resources/html/slime/
-	rsync -av $(SBCL_I386)/share/doc/sbcl/html/asdf \
+	rsync -a doc/html/HyperSpec "$(APP)"/Contents/Resources/html
+	rsync -a slime/doc/html/ "$(APP)"/Contents/Resources/html/slime/
+	rsync -a $(SBCL_I386)/share/doc/sbcl/html/asdf \
 		"$(APP)"/Contents/Resources/html
-	rsync -av $(SBCL_I386)/share/doc/sbcl/html/sbcl \
+	rsync -a $(SBCL_I386)/share/doc/sbcl/html/sbcl \
 		"$(APP)"/Contents/Resources/html
 	mv "$(APP)"/Contents/Resources/Aquamacs\ Help \
 		"$(APP)"/Contents/Resources/html
@@ -430,15 +432,15 @@ build/ReadyLisp-$(VERSION).dmg:
 	rsync -aE aquamacs/"$(AQUA_APP)"/ "$(APP)"/
 	rsync -a --delete slime/ \
 		"$(APP)"/Contents/Resources/site-lisp/edit-modes/slime/
-	rsync -av site-lisp/ "$(APP)"/Contents/Resources/site-lisp/
+	rsync -a site-lisp/ "$(APP)"/Contents/Resources/site-lisp/
 	patch -p0 -d "$(APP)"/Contents/Resources < site-lisp/site-start.patch
-	rsync -av --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
+	rsync -a --exclude=share/ --exclude=bin/sbcl --exclude=lib/sbcl/sbcl.core \
 		build/sbcl/ "$(APP)"/Contents/Resources/sbcl/
-	rsync -av --exclude=doc/ --exclude=obj/ --exclude=output/ \
+	rsync -a --exclude=doc/ --exclude=obj/ --exclude=output/ \
 		--exclude=tests/ --exclude=tools-for-build/ \
 		sbcl/ "$(APP)"/Contents/Resources/sbcl/source/
-	rsync -av site/ "$(APP)"/Contents/Resources/sbcl/site/
-	rsync -av systems/ "$(APP)"/Contents/Resources/sbcl/systems/
+	rsync -a site/ "$(APP)"/Contents/Resources/sbcl/site/
+	rsync -a systems/ "$(APP)"/Contents/Resources/sbcl/systems/
 	test ! -x $(shell which latex) || make copy-docs
 	chmod -R go+rX /tmp/Ready\ Lisp
 	(cd /tmp/Ready\ Lisp; ln -s /Applications .)
@@ -450,7 +452,7 @@ build/ReadyLisp-$(VERSION).dmg:
 disk-image: build/ReadyLisp-$(VERSION).dmg
 
 clean:
-	rm -fr build *.dmg
+	rm -fr build *-log.txt
 	test ! -d slime || find slime -name '*.fasl' -delete
 	test ! -d slime || find slime -name '*.elc' -delete
 	find site-lisp -name '*.elc' -delete
