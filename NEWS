@@ -1,3 +1,44 @@
+* New in version 20080426
+
+** Upgraded various components, the current versions are:
+
+     Aquamacs    1.3b
+     SBCL        1.0.16
+     SLIME       2008-04-24
+     CL-FAD      0.6.2
+     CL-PPCRE    1.3.2
+     LOCAL-TIME  0.9.3
+     SERIES      2.2.9
+
+** The Intel side of Ready Lisp now runs 32-bit only, instead of 64-bit and
+   32-bit as before.  This is because 64-bit support is not official yet, and
+   often yields inferior stack traces to the 32-bit version.
+
+** Threading support has been disabled.  This is a feature that is also not
+   officially supported on OS X yet, and can cause unpredictable behavior and
+   lock ups in the SBCL compiler.  My feeling is that if someone needs to do
+   enough work with SBCL to use threads, they will also be able to build their
+   own Ready Lisp (see the next note).  For most users this package, however,
+   their interests are better served by sticking to what is fully supported.
+
+** Ready Lisp is now built using a completely different Makefile system which
+   makes it possible for anyone to easily create their own Ready Lisp
+   distribution.  See the bottom of the README for details.
+
+   If you have a PowerPC machine accessible via ssh, you can even build a
+   fully universal build of Ready Lisp.  Here's how I build locally, where my
+   PowerBook G4 is accessible at 192.168.2.102:
+
+     git clone git://github.com/jwiegley/ready-lisp.git \
+         && cd ready-lisp \
+         && time sh build.sh 192.168.2.102
+
+   This process takes a very long time (several hours), but in the ends yields
+   a .dmg file which contains all that you need.  If you need to update the
+   versions of the various sub-packages, please edit the Makefile.  Also,
+   don't specify an IP address to build.sh if you don't have a PowerPC machine
+   to build with.
+
 * New in version 1.0.12-10.5.1-2
 
 ** A couple of pathname issues were discovered that led to the inability to

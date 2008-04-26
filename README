@@ -1,13 +1,16 @@
-Welcome to Ready Lisp!
+
+			   ========================
+			    Welcome to Ready Lisp!
+			   ========================
 
 The intention of this project to provide a fulling working Lisp environment
 that's only a double-click away for Mac OS X users.
 
 This package includes the following code items:
 
- - Aquamacs 1.2a
- - SBCL (Steel Bank Common Lisp) 1.0.12
- - SLIME (Superior Lisp Interaction Mode for Emacs) CVS 2007-12-06
+ - Aquamacs 1.3b
+ - SBCL (Steel Bank Common Lisp) 1.0.16
+ - SLIME (Superior Lisp Interaction Mode for Emacs) CVS 2008-04-24
  - paredit.el
  - redshank.el
  - cldoc.el
@@ -32,15 +35,6 @@ all modes.  If you wish to configure things, edit this file:
   Ready Lisp.app/Contents/Resources/site-lisp/init.lisp.el
 
 
-NOTE to Intel users: Experimental threading has been enabled in this version
-of Ready Lisp.  Also it is entirely universal, meaning it runs on PowerPC as
-well as 64-bit and 32-bit Intel machines.  If you want to force it to run at
-32-bit on a 64-bit machine (I find the debugging is nicer with the 32-bit
-version), edit the init-lisp.el file mentioned about and change the value of
-the variable `slime-use-intel-x86-64' from "t" to "nil".  Then type
-`M-x byte-compile-file' to recompile init-lisp.el, and restart Ready Lisp.
-
-
 Happy Lisping,
   John Wiegley @ http://www.newartisans.com
 
@@ -50,9 +44,11 @@ Happy Lisping,
 p.s. If you are interested in building Ready Lisp yourself, the process has
      been made quite simple:
 
-     git clone git://newartisans.com/readylisp.git && cd readylisp && make
+       git clone git://github.com/jwiegley/ready-lisp.git
+       cd ready-lisp
+       make
 
-     This will take quite some time, but will eventually leave a disk image in
-     the "build" subdirectory which matches the current version of Ready Lisp.
-     Edit the Makefile if you wish to update any of the sub-packages to newer
-     versions.
+     This take quite a while (several years), but will eventually leave a disk
+     image in the "build" sub-directory.  (Edit the Makefile if you wish to
+     update any of the sub-packages to newer versions; then do "make scour"
+     and run "make" again).
