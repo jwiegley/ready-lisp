@@ -136,7 +136,7 @@ $(AQUA_DMG):
 BOOTSTRAP_DEPS =				\
 	bootstrap.lisp				\
 	site					\
-	slime					\
+	slime/swank.lisp			\
 	site/cl-fad-$(CL_FAD_VER)		\
 	site/cl-ppcre-$(CL_PPCRE_VER)		\
 	site/local-time-$(LOCAL_TIME_VER)	\
@@ -261,7 +261,7 @@ site:
 
 SLIME_GIT = git://github.com/nablaone/slime.git
 
-slime:
+slime/swank.lisp:
 	git clone $(SLIME_GIT)
 
 ######################################################################
