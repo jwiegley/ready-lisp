@@ -474,7 +474,7 @@ ReadyLisp/Contents/Resources/html:
 
 ######################################################################
 
-ReadyLisp/Contents/Resources/pdf/sbcl.pdf: sbcl/doc/manual/sbcl.pdf
+ReadyLisp/Contents/Resources/pdf/sbcl.pdf:
 	rsync -a $(SBCL_I386)/share/man/ "$(RESOURCES)"/man/
 	cp -p $(SBCL_I386)/share/info/*.info* "$(RESOURCES)"/info/
 	cp -p $(SBCL_I386)/share/doc/sbcl/*.pdf "$(RESOURCES)"/pdf/
