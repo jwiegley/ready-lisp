@@ -189,7 +189,7 @@ $(SBCL_I386)/bin/sbcl: \
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
 	 sh make.sh > sbcl-i386-log.txt 2>&1 &&				\
 	 (test ! -x "$(shell which latex)" ||				\
-	    (cd sbcl/doc && sh make-doc.sh > sbcl-doc-log.txt 2>&1 &&	\
+	    (cd doc && sh make-doc.sh > sbcl-doc-log.txt 2>&1 &&	\
 	     cd manual && make > sbcl-manual-log.txt 2>&1 ));		\
 	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) &&		\
 	 INSTALL_ROOT=$(SBCL_I386)					\
