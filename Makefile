@@ -25,6 +25,9 @@ SBCL_VER	       = 1.0.16
 
 SBCL_RELEASE_BRANCH    = sbcl_1_0_16
 
+# Change this to 'yes' if you want experimental threading support
+THREADING              = no
+
 # These versions should much more rarely.  Here are the URLs where you
 # can check for the latest:
 #
@@ -221,10 +224,17 @@ $(SBCL_PPC)/bin/sbcl: \
 
 SBCL_GIT = git://sbcl.boinkor.net/sbcl.git
 
+ifeq ($(THREADING),yes)
+sbcl/version.lisp-expr: sbcl/customize-target-features.lisp
+else
 sbcl/version.lisp-expr:
+endif
 	@test -f sbcl/version.lisp-expr ||			\
 	    (rm -fr sbcl; git clone $(SBCL_GIT) &&		\
 	     cd sbcl && git checkout $(SBCL_RELEASE_BRANCH))
+
+sbcl/customize-target-features.lisp: customize-target-features.lisp
+	cp -p $< $@
 
 ######################################################################
 

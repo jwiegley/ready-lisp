@@ -38,17 +38,35 @@ all modes.  If you wish to configure things, edit this file:
 Happy Lisping,
   John Wiegley @ http://www.newartisans.com
 
+
 ----------------------------------------------------------------------
 
+NOTE: 64-bit and threading support are not enabled in Ready Lisp, because
+neither of these is officially supported by SBCL on Mac OS X (yet).  If you
+wish to enable them, you will have to build your own Ready Lisp from sources.
+Fortunately, this process has been made quite simple for you:
 
-p.s. If you are interested in building Ready Lisp yourself, the process has
-     been made quite simple:
+  git clone git://github.com/jwiegley/ready-lisp.git
+  cd ready-lisp
+  make
 
-       git clone git://github.com/jwiegley/ready-lisp.git
-       cd ready-lisp
-       make
+This may take quite a while, but eventually it will leave a .dmg file in an
+"image" sub-directory.
 
-     This take quite a while (several years), but will eventually leave a disk
-     image in the "build" sub-directory.  (Edit the Makefile if you wish to
-     update any of the sub-packages to newer versions; then do "make scour"
-     and run "make" again).
+To build with 64-bit Intel support:
+
+  make ARCH=x86_64
+
+To build with threading enabled:
+
+  make THREADING=yes
+
+To build a universal binary, assuming you have ssh access to a PowerPC box
+named "ppcbox":
+
+  make PPC_HOST=ppcbox
+
+If you wish to update any of the sub-packages to newer versions, edit the
+Makefile to select the version(s) you want, run "git checkout <TAG>" within
+sbcl to select a release tag, and finally run "make clean", followed by
+another "make".
