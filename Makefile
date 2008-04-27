@@ -91,9 +91,9 @@ READY_LISP_DOC_DEPS =						\
 	ReadyLisp/Contents/Resources/pdf/slime.pdf
 
 ifeq ($(LATEX),none)
-image:	$(READY_LISP_DEPS) $(READY_LISP_DOC_DEPS)
-else
 image:	$(READY_LISP_DEPS)
+else
+image:	$(READY_LISP_DEPS) $(READY_LISP_DOC_DEPS)
 endif
 	chmod -R go+rX image
 	ln -sf /Applications image
@@ -434,7 +434,7 @@ slime/slime.elc: slime/slime.el
 ######################################################################
 
 ReadyLisp/Contents/Resources/sbcl/site: site
-	rsync -a site/ "$(RESOURCES)"/sbcl/site/
+	rsync -a --exclude='*.tar.*' site/ "$(RESOURCES)"/sbcl/site/
 
 ReadyLisp/Contents/Resources/sbcl/systems: systems
 	rsync -a systems/ "$(RESOURCES)"/sbcl/systems/
