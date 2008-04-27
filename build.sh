@@ -16,7 +16,9 @@ cd /tmp
 
 rm -fr ready-lisp
 
-ssh $PPC_HOST rm -fr /tmp/ready-lisp
+if [[ -n "$PPC_HOST" ]]; then
+    ssh $PPC_HOST rm -fr /tmp/ready-lisp
+fi
 
 if [[ $local == true ]]; then
     rsync -a ~/src/ready-lisp .
@@ -26,6 +28,6 @@ fi
 
 cd ready-lisp && \
     time make PPC_HOST=$PPC_HOST && \
-    cp /tmp/ready-lisp/build/ReadyLisp-*.dmg .
+    mv /tmp/ready-lisp/image/ReadyLisp-*.dmg .
 
 # build.sh ends here
