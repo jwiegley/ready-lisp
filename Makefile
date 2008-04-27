@@ -382,7 +382,7 @@ $(SBCL_PPC): sbcl-$(SBCL_VER)-ppc.tar.bz2
 ifeq ($(PPC_HOST),none)
 
 sbcl-$(SBCL_VER)-ppc.tar.bz2: $(SBCL_PPC_CORE)
-	tar cjf $@ build/sbcl/ppc
+	tar cjf $@ build/sbcl/powerpc
 
 else
 
