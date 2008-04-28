@@ -1,4 +1,5 @@
 *.elc
+*.dmg
 .DS_Store
 /aquamacs
 /build
