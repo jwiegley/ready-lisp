@@ -20,6 +20,8 @@ if [[ -n "$PPC_HOST" ]]; then
     ssh $PPC_HOST rm -fr /tmp/ready-lisp || exit 1
 fi
 
+cd /tmp
+
 if [[ $local == true ]]; then
     rsync -a ~/src/ready-lisp . || exit 1
 else
