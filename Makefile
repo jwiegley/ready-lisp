@@ -481,10 +481,10 @@ ReadyLisp/Contents/Resources/pdf:
 
 ReadyLisp/Contents/Resources/html:
 	mkdir $@
-	test ! -e $@/../Aquamacs\ Help	       || mv $@/../Aquamacs\ Help $@
-	test ! -e $@/../Emacs\ Manual	       || mv $@/../Emacs\ Manual $@
-	test ! -e $@/../Emacs\ Lisp\ Reference || mv $@/../Emacs\ Lisp\ Reference $@
-	test ! -e $@/../elisp		       || mv $@/../elisp $@
+	test ! -d $@/../Aquamacs\ Help	       || mv $@/../Aquamacs\ Help $@
+	test ! -d $@/../Emacs\ Manual	       || mv $@/../Emacs\ Manual $@
+	test ! -d $@/../Emacs\ Lisp\ Reference || mv $@/../Emacs\ Lisp\ Reference $@
+	test ! -L $@/../elisp		       || mv $@/../elisp $@
 
 ######################################################################
 
