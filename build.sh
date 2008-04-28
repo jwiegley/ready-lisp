@@ -14,22 +14,20 @@ PPC_HOST=$1
 
 PWD=$(pwd)
 
-cd /tmp
-
-rm -fr ready-lisp
+rm -fr /tmp/ready-lisp
 
 if [[ -n "$PPC_HOST" ]]; then
-    ssh $PPC_HOST rm -fr /tmp/ready-lisp
+    ssh $PPC_HOST rm -fr /tmp/ready-lisp || exit 1
 fi
 
 if [[ $local == true ]]; then
-    rsync -a ~/src/ready-lisp .
+    rsync -a ~/src/ready-lisp . || exit 1
 else
-    git clone git://github.com/jwiegley/ready-lisp.git
+    git clone git://github.com/jwiegley/ready-lisp.git || exit 1
 fi
 
-cd ready-lisp && \
-    time make PPC_HOST=$PPC_HOST && \
-    mv /tmp/ready-lisp/build/ReadyLisp-*.dmg $PWD
+cd ready-lisp && make PPC_HOST=$PPC_HOST || exit 1
+
+mv build/ReadyLisp-*.dmg $PWD
 
 # build.sh ends here
