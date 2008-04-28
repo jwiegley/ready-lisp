@@ -265,7 +265,7 @@ $(SBCL_PPC_BOOTSTRAP_TBZ):
 ######################################################################
 
 site:
-	mkdir site
+	mkdir $@
 
 ######################################################################
 
@@ -341,7 +341,7 @@ site/$(SERIES_TBZ):
 ######################################################################
 
 systems:
-	mkdir systems
+	mkdir $@
 	(cd systems; ln -sf ../site/*/*.asd .)
 
 ######################################################################
@@ -477,10 +477,14 @@ site-lisp/paredit.elc: \
 ######################################################################
 
 ReadyLisp/Contents/Resources/pdf:
-	mkdir "$(RESOURCES)"/pdf/
+	mkdir $@
 
 ReadyLisp/Contents/Resources/html:
-	mkdir "$(RESOURCES)"/html/
+	mkdir $@
+	test ! -e $@/../Aquamacs\ Help	       || mv $@/../Aquamacs\ Help $@
+	test ! -e $@/../Emacs\ Manual	       || mv $@/../Emacs\ Manual $@
+	test ! -e $@/../Emacs\ Lisp\ Reference || mv $@/../Emacs\ Lisp\ Reference $@
+	test ! -e $@/../elisp		       || mv $@/../elisp $@
 
 ######################################################################
 
@@ -523,7 +527,7 @@ ReadyLisp/Contents/Resources/html/HyperSpec: doc/html doc/html/HyperSpec
 	rsync -a doc/html/HyperSpec "$(RESOURCES)"/html
 
 doc/html:
-	-mkdir doc/html
+	mkdir doc/html
 
 doc/html/HyperSpec: doc/html/$(HYPERSPEC_TGZ)
 	(cd doc/html; tar xzf $(HYPERSPEC_TGZ))
