@@ -84,12 +84,12 @@ READY_LISP_DEPS =						\
 	ReadyLisp/Contents/Resources/sbcl/systems		\
 	ReadyLisp/Contents/Resources/site-lisp/site-start.el	\
 	ReadyLisp/Contents/Resources/site-lisp/paredit.elc	\
-	ReadyLisp/Contents/Resources/sbcl/source		\
-	ReadyLisp/Contents/Resources/html/HyperSpec
+	ReadyLisp/Contents/Resources/sbcl/source
 
 READY_LISP_DOC_DEPS =						\
-	ReadyLisp/Contents/Resources/pdf			\
 	ReadyLisp/Contents/Resources/html			\
+	ReadyLisp/Contents/Resources/html/HyperSpec		\
+	ReadyLisp/Contents/Resources/pdf			\
 	ReadyLisp/Contents/Resources/pdf/sbcl.pdf		\
 	ReadyLisp/Contents/Resources/pdf/slime.pdf
 
