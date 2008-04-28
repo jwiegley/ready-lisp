@@ -28,6 +28,6 @@ fi
 
 cd ready-lisp && \
     time make PPC_HOST=$PPC_HOST && \
-    mv /tmp/ready-lisp/image/ReadyLisp-*.dmg .
+    mv /tmp/ready-lisp/build/ReadyLisp-*.dmg .
 
 # build.sh ends here
