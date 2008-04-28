@@ -12,6 +12,8 @@ PPC_HOST=$1
 # relevant version numbers and URLs have been updated and pushed to the Github
 # repository first.
 
+PWD=$(pwd)
+
 cd /tmp
 
 rm -fr ready-lisp
@@ -28,6 +30,6 @@ fi
 
 cd ready-lisp && \
     time make PPC_HOST=$PPC_HOST && \
-    mv /tmp/ready-lisp/build/ReadyLisp-*.dmg .
+    mv /tmp/ready-lisp/build/ReadyLisp-*.dmg $PWD
 
 # build.sh ends here
