@@ -272,7 +272,7 @@ site:
 SLIME_GIT = git://github.com/nablaone/slime.git
 
 slime/swank.lisp:
-	git clone $(SLIME_GIT)
+	rm -fr slime; git clone $(SLIME_GIT)
 
 ######################################################################
 
