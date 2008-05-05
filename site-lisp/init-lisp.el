@@ -140,7 +140,7 @@
 			      "sysctl hw.optional.x86_64")))
 	  "x86_64"
 	"i386")
-    (or "ppc" "ppc64")))
+    "ppc"))
 
 (defvar *ready-lisp-resources-path*
   (expand-file-name ".." (file-name-directory load-file-name)))
@@ -149,7 +149,10 @@
   (expand-file-name "sbcl/" *ready-lisp-resources-path*))
 
 (defvar *sbcl-lib-path*
-  (expand-file-name (concat "sbcl/" *sbcl-arch* "/lib/sbcl/")
+  (expand-file-name (concat "sbcl/" (if (string= *sbcl-arch* "ppc")
+					"powerpc"
+				      *sbcl-arch*)
+			    "/lib/sbcl/")
 		    *ready-lisp-resources-path*))
 
 (defvar *sbcl-source-path*
