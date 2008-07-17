@@ -28,7 +28,11 @@ else
     git clone git://github.com/jwiegley/ready-lisp.git || exit 1
 fi
 
-cd ready-lisp && make PPC_HOST=$PPC_HOST || exit 1
+if [[ -n "$PPC_HOST" ]]; then
+    cd ready-lisp && make PPC_HOST=$PPC_HOST || exit 1
+else
+    cd ready-lisp && make || exit 1
+fi
 
 mv build/ReadyLisp-*.dmg $HERE
 
