@@ -1,6 +1,6 @@
 [submodule "sbcl"]
 	path = sbcl
-	url = sbcl
+	url = git://sbcl.boinkor.net/sbcl.git
 [submodule "slime"]
 	path = slime
-	url = slime
+	url = git://github.com/nablaone/slime.git
