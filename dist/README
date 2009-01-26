@@ -45,7 +45,6 @@ Finally, there are several steps to be performed to complete the release:
   - Update the background image
   - Update the git repositories
   - Update the NEWS file
-  - Update the project page
   - Update the Ready Lisp project page to indicate the new version(s)
   - Upload the new files to the FTP repository
   - Sign the disk image with GnuPG
