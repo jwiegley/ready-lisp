@@ -1,8 +1,8 @@
---- image/Ready Lisp.app/Contents/Resources/site-lisp/site-start.el	2007-10-02 17:09:49.000000000 -0400
-+++ site-lisp/site-start.el	2008-04-10 01:56:25.000000000 -0400
-@@ -93,4 +93,5 @@
-   ;; workaround - Emacs doesn't do it  (0.9.9b)
-   (add-hook 'after-init-hook 'display-startup-echo-area-message 'append)
+--- site-lisp/site-start.el.old	2009-01-25 19:57:28.000000000 -0400
++++ site-lisp/site-start.el	2009-01-25 19:57:49.000000000 -0400
+@@ -102,4 +102,5 @@
+ 
+   (add-hook 'after-init-hook 'display-startup-echo-area-message-2 'append)
  
 +  (require 'init-lisp)
    )

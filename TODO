@@ -6,3 +6,71 @@ READY-LISP  -*- mode: org; fill-column: 78 -*-
 #+TAGS: FEATURE(f) DOCS(d) WEBSITE(w) BUILD(b)
 #+CATEGORY: ReadyLisp
 
+* TODO [#B] Add section on the project page on how to build it
+  :PROPERTIES:
+  :ID: 68329AF0-7E5D-4208-8519-988E3CDB7BF4
+  :END:
+  [2008-05-05 Mon]
+* TODO [#B] Download link for .dmg is resulting in files ending .bz2
+  http://www.haloscan.com/comments/jwiegley/rw_unique_entry_id_49_page6/?src=hsrs#66862
+  [[message://20080617054832.826E8539622@mail.johnwiegley.com]["ReadyLisp download link" from Yousef Ourabi <yourabi@zero-analog.com>]]
+  :PROPERTIES:
+  :ID: 8704AB0D-81F9-45DB-AE24-18470FCE9E15
+  :END:
+  [2008-06-17 Tue]
+* TODO [#B] Repackage the SLIME and SBCL code as Aquamacs plugin
+  [[message://61A3A4CD-DD65-416D-8D93-B9736DC2299E@gmail.com]["Re: New version of sbcl requires newer version or update to SLIME" from David Reitter <david.reitter@gmail.com>]]
+  [[message://8757cb490807071342o2566d406m349c55f54675c059@mail.gmail.com]["Re: New version of sbcl requires newer version or update to SLIME" from Bill Clementson <billclem@gmail.com>]]
+  :PROPERTIES:
+  :ID: 68E87271-6FB4-4EDB-94DA-FE7C9FE0D34F
+  :END:
+  [2008-07-07 Mon]
+* TODO [#C] Redirect software/readylisp.html to ready-lisp.html
+  :PROPERTIES:
+  :ID: 826E275C-58FB-4972-B5D5-D7497070494B
+  :END:
+  [2008-05-05 Mon]
+* TODO [#B] Check out Ready Lisp icons Mark sent me
+  [[message://BC799FE4-5563-4C72-BCC6-2A547FC378E0@googlemail.com][E-mail from Mark]]
+  :PROPERTIES:
+  :ID: 8113183D-FDC3-40E9-AFF8-F3A49348642A
+  :END:
+  [2008-06-16 Mon]
+* TODO [#B] Prepare a new release of Ready Lisp
+  SCHEDULED: <2008-09-19 Fri +6m>
+  - [ ] Add an MD5 for the image and the signature to MD5SUMS.txt
+  - [ ] Announce the new version on my computing blog
+  - [ ] Build a binary of Ready Lisp for Tiger
+  - [ ] Build a universal binary image
+  - [ ] Check for new versions of the dependency libraries
+  - [ ] Check for updates to paredit.el
+  - [ ] Check for updates to redshank.el
+  - [ ] Check to see if Aquamacs has been updated
+  - [ ] Copy the disk image file to pub/lisp/ready-lisp
+  - [ ] Do an Intel test build, to make sure everything works OK
+  - [ ] Post the new version info to apple.com software downloads
+  - [ ] Post the new version info to comp.lang.lisp
+  - [ ] Post the new version info to coolosxapps.com
+  - [ ] Post the new version info to freshmeat.net
+  - [ ] Post the new version info to iusethis.com
+  - [ ] Post the new version info to linuxlinks.com
+  - [ ] Post the new version info to macupdate.com
+  - [ ] Post the new version info to versiontracker.com
+  - [ ] Pull the latest changes from SBCL
+  - [ ] Pull the latest changes from SLIME
+  - [ ] Sign the image with GnuPG
+  - [ ] Test if C-h f mapcar RET takes you to the HyperSpec info pages
+  - [ ] Test if C-h i m sbcl RET takes you to the SBCL manual
+  - [ ] Test if M-. mapcar RET takes you to the source code
+  - [ ] Test that the system runs successively on a PowerPC system
+  - [ ] Test whether a new package can be installed using asdf-install
+  - [ ] Update the background image
+  - [ ] Update the git repositories
+  - [ ] Update the NEWS file
+  - [ ] Update the project page
+  - [ ] Update the Ready Lisp project page to indicate the new version(s)
+  - [ ] Upload the new files to the FTP repository
+  :PROPERTIES:
+  :ID: D2BE5F3F-32AF-4679-B580-107CC06A7983
+  :END:
+  [2008-08-15 Fri]

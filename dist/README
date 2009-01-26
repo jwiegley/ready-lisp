@@ -5,24 +5,58 @@ If any of the component versions are updated, then Background.graffle should
 be edited (with OmniGraffle), and the resulting image re-exported.  Here are
 the steps that I use:
 
- 1. Open Background.graffle with OmniGraffle.  It was created with
-    OmniGraffle Professional 5.
+ 1. Open Background.graffle with OmniGraffle.  It was created with OmniGraffle
+    Professional 5.
 
  2. Edit the version numbers as needed.
 
  3. Make sure nothing is selected.
 
- 4. Choose menu option: File | Export... (Cmd-Opt-E)
+ 4. Choose menu option: File | Export... (Command-Option-E)
 
- 5. Export the image to "dist/image.png" with the following settings:
+ 5. Export the image to "dist/image.png" with the following settings, after
+    unchecking everything:
 
-    First, uncheck everything.
+      Export Area:        Current Canvas
+      Format:             PNG bitmap image
+      Scale:              100%
+      Bitmap Resolution:  72 dots per inch
 
-    Format:             PNG bitmap image
-    Scale:              100%
-    Bitmap Resolution:  72 dots per inch
+ 6. Once the file is saved, you can exit OmniGraffle.  Nothing more needs to
+    be done except to run "make", or "make disk-image" if you already did a
+    make but then realized you forgot to update the background image (it
+    happens!).
 
- 6. Once the file is saved, you can exit OmniGraffle.  Nothing more
-    needs to be done except to run "make", or "make disk-image" if you
-    already did a make but then realized you forgot to update the
-    background image (it happens!).
+-------------------------------------------------------------------------------
+
+Once the disk image is built, there are several sanity checks that should be
+performed, to make sure that everything works together:
+
+  - Test if C-h f mapcar RET takes you to the HyperSpec info pages
+  - Test if C-h i m sbcl RET takes you to the SBCL manual
+  - Test if M-. mapcar RET takes you to the source code
+  - Test that the system runs successively on a PowerPC system
+  - Test whether a new package can be installed using asdf-install
+
+-------------------------------------------------------------------------------
+
+Finally, there are several steps to be performed to complete the release:
+
+  - Update the background image
+  - Update the git repositories
+  - Update the NEWS file
+  - Update the project page
+  - Update the Ready Lisp project page to indicate the new version(s)
+  - Upload the new files to the FTP repository
+  - Sign the disk image with GnuPG
+  - Copy the disk image file to pub/lisp/ready-lisp
+  - Add an MD5 for the image and the signature to MD5SUMS.txt
+  - Announce the new version on my computing blog
+  - Post the new version info to apple.com software downloads
+  - Post the new version info to comp.lang.lisp
+  - Post the new version info to coolosxapps.com
+  - Post the new version info to freshmeat.net
+  - Post the new version info to iusethis.com
+  - Post the new version info to linuxlinks.com
+  - Post the new version info to macupdate.com
+  - Post the new version info to versiontracker.com

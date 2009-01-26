@@ -8,22 +8,22 @@ VERSION	    = $(shell date +%Y%m%d)
 ARCH	    = $(shell uname -p)
 PWD	    = $(shell pwd)
 LATEX       = $(shell which latex || echo none)
-LOCAL_CACHE = $(HOME)/Public/lisp/ready-lisp/deps
+LOCAL_CACHE = $(HOME)/Projects/ready-lisp/site
 
 ######################################################################
 
 # Go to sbcl.org and check the Downloads page to find out what versions
 # these should be now.
 
-SBCL_BOOTSTRAP_VER     = 1.0.12
-SBCL_PPC_BOOTSTRAP_VER = 1.0.2
+SBCL_BOOTSTRAP_VER     = 1.0.23
+SBCL_PPC_BOOTSTRAP_VER = 1.0.22
 
 # This version is from aquamacs.org.
 
-AQUA_VER	       = 1.3b
-SBCL_VER	       = 1.0.16
+AQUA_VER	       = 1.6
+SBCL_VER	       = 1.0.24
 
-SBCL_RELEASE_BRANCH    = sbcl_1_0_16
+SBCL_RELEASE_BRANCH    = sbcl_1_0_24
 
 # Change this to 'yes' if you want experimental threading support
 THREADING              = no
@@ -37,11 +37,15 @@ THREADING              = no
 #  SERIES      http://series.sourceforge.net/
 
 CL_FAD_VER	       = 0.6.2
-CL_PPCRE_VER	       = 1.3.2
+CL_PPCRE_VER	       = 2.0.1
 LOCAL_TIME_VER	       = 0.9.3
-SERIES_VER	       = 2.2.9
+SERIES_VER	       = 2.2.10
 
 HYPERSPEC_VER	       = 7-0
+
+#PAREDIT  = http://mumble.net/~campbell/emacs/
+#REDSHANK = http://www.foldr.org/~michaelw/emacs/redshank/
+#CLDOC    = http://homepage1.nifty.com/bmonkey/lisp/index-en.html
 
 ######################################################################
 
@@ -453,6 +457,7 @@ ReadyLisp/Contents/Resources/sbcl/systems: systems
 
 ReadyLisp/Contents/Resources/site-lisp/site-start.el: site-lisp/site-start.patch
 	patch -p0 -N -d "$(RESOURCES)" < site-lisp/site-start.patch
+	rm -f ReadyLisp/Contents/Resources/site-lisp/site-start.elc
 
 ReadyLisp/Contents/Resources/site-lisp/paredit.elc: site-lisp/paredit.elc
 	rsync -a --exclude=site-start.patch site-lisp/ "$(RESOURCES)"/site-lisp/
