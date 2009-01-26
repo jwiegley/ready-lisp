@@ -8,7 +8,7 @@ VERSION	    = $(shell date +%Y%m%d)
 ARCH	    = $(shell uname -p)
 PWD	    = $(shell pwd)
 LATEX       = $(shell which latex || echo none)
-LOCAL_CACHE = $(HOME)/Projects/ready-lisp/site
+LOCAL_CACHE = $(HOME)/Projects/ready-lisp/deps
 
 ######################################################################
 
@@ -74,7 +74,7 @@ build/ReadyLisp-$(VERSION).dmg: image
 
 RESOURCES = image/Ready Lisp.app/Contents/Resources
 AQUA_DMG  = Aquamacs-Emacs-$(AQUA_VER).dmg
-AQUA_URL  = http://www.tardis.ed.ac.uk/~dreitter/$(AQUA_DMG)
+AQUA_URL  = http://d10xg45o6p6dbl.cloudfront.net/projects/a/aquamacs/$(AQUA_DMG)
 
 READY_LISP_DEPS =						\
 	image/README						\
