@@ -245,23 +245,23 @@ sbcl/customize-target-features.lisp: customize-target-features.lisp
 $(SBCL_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_BOOTSTRAP_TBZ)
 	tar xjf $(SBCL_BOOTSTRAP_TBZ)
 	ln -f $(SBCL_BOOTSTRAP)/output/sbcl.core $(SBCL_BOOTSTRAP)/contrib
-	touch $(SBCL_BOOTSTRAP)/src/runtime/sbcl
+	touch $@
 
 $(SBCL_BOOTSTRAP_TBZ):
 	if [ -f $(LOCAL_CACHE)/$(SBCL_BOOTSTRAP_TBZ) ]; then	\
 	    ln $(LOCAL_CACHE)/$(SBCL_BOOTSTRAP_TBZ) $@;		\
-	else								\
-	    curl -Lo $@ $(SBCL_BOOTSTRAP_TBZ_URL);			\
+	else							\
+	    curl -Lo $@ $(SBCL_BOOTSTRAP_TBZ_URL);		\
 	fi
 
 $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_PPC_BOOTSTRAP_TBZ)
 	tar xjf $(SBCL_PPC_BOOTSTRAP_TBZ)
 	ln -f $(SBCL_PPC_BOOTSTRAP)/output/sbcl.core $(SBCL_PPC_BOOTSTRAP)/contrib
-	touch $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl
+	touch $@
 
 $(SBCL_PPC_BOOTSTRAP_TBZ):
 	if [ -f $(LOCAL_CACHE)/$(SBCL_PPC_BOOTSTRAP_TBZ) ]; then	\
-	    ln $(LOCAL_CACHE)/$(SBCL_PPC_BOOTSTRAP_TBZ) $@;	\
+	    ln $(LOCAL_CACHE)/$(SBCL_PPC_BOOTSTRAP_TBZ) $@;		\
 	else								\
 	    curl -Lo $@ $(SBCL_PPC_BOOTSTRAP_TBZ_URL);			\
 	fi
