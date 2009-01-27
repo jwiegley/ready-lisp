@@ -21,6 +21,8 @@
 (dolist (module '("swank-c-p-c"
 		  "swank-arglists"
 		  "swank-asdf"
+		  "swank-package-fu"
+		  "swank-sbcl-exts"
 		  "swank-fancy-inspector"
 		  "swank-fuzzy"
 		  "swank-presentations"
