@@ -572,12 +572,13 @@ doc/html/$(HYPERSPEC_TGZ):
 
 update:
 	git pull
-	test -d sbcl && (cd sbcl && git pull)
-	test -d slime && (cd slime && git pull)
+	git submodule init
+	git submodule update
+	-(cd deps; sh download.sh)
 
 clean:
-	rm -f ReadyLisp *.dmg *.bz2 *-log.txt
-	rm -fr build image sbcl-*-darwin
+	rm -f ReadyLisp *.dmg *.bz2 *.zip *-log.txt
+	rm -fr build build.log image sbcl-*-darwin
 	test ! -d slime || find slime -name '*.fasl' -delete
 	test ! -d slime || find slime -name '*.elc' -delete
 	find site-lisp -name '*.elc' -delete
