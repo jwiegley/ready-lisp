@@ -1,6 +1,16 @@
---- site-lisp/site-start.el.old	2009-01-25 19:57:28.000000000 -0400
-+++ site-lisp/site-start.el	2009-01-25 19:57:49.000000000 -0400
-@@ -102,4 +102,5 @@
+--- site-lisp/site-start.el.old	2009-01-27 03:15:43.000000000 -0400
++++ site-lisp/site-start.el	2009-01-27 03:15:25.000000000 -0400
+@@ -60,6 +60,9 @@
+   (setq unicode-emacs 0)
+   (require 'cocoa-compatibility))
+ 
++(unless (file-directory-p "~/Library/Preferences/Aquamacs Emacs")
++  (make-directory "~/Library/Preferences/Aquamacs Emacs" t))
++
+ (when ;; do not load this twice 
+     (not (memq 'aquamacs-site-start features))
+  
+@@ -102,4 +105,5 @@
  
    (add-hook 'after-init-hook 'display-startup-echo-area-message-2 'append)
  
