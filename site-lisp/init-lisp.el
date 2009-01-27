@@ -123,8 +123,13 @@
    slime-presentation-streams
    slime-presentations
    slime-references
+   slime-sbcl-exts
+   slime-package-fu
+   slime-fontifying-fu
+   slime-mdot-fu
    slime-scratch
    slime-tramp
+   slime-enclosing-context
    ;; slime-typeout-frame
    slime-xref-browser))
 
