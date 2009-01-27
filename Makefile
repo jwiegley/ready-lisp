@@ -154,24 +154,24 @@ $(SBCL_I386_CORE): $(SBCL_I386)/bin/sbcl $(BOOTSTRAP_DEPS)
 	find slime site -name '*.fasl' -delete
 	rm -fr ~/.slime
 	SBCL_HOME=$(SBCL_I386_LIB) $(SBCL_I386)/bin/sbcl	\
-		--core $(SBCL_I386_LIB)/sbcl.core		\
-		--load bootstrap.lisp > sbcl-i386-core-log.txt 2>&1
+	    --core $(SBCL_I386_LIB)/sbcl.core			\
+	    --load bootstrap.lisp > sbcl-i386-core-log.txt 2>&1
 	mv sbcl.core-with-slime $@
 
 $(SBCL_X86_64_CORE): $(SBCL_X86_64)/bin/sbcl $(BOOTSTRAP_DEPS)
 	find slime site -name '*.fasl' -delete
 	rm -fr ~/.slime
-	SBCL_HOME=$(SBCL_X86_64_LIB) $(SBCL_X86_64)/bin/sbcl	\
-		--core $(SBCL_X86_64_LIB)/sbcl.core		\
-		--load bootstrap.lisp > sbcl-x86_64-core-log.txt 2>&1
+	SBCL_HOME=$(SBCL_X86_64_LIB) $(SBCL_X86_64)/bin/sbcl		\
+	    --core $(SBCL_X86_64_LIB)/sbcl.core				\
+	    --load bootstrap.lisp > sbcl-x86_64-core-log.txt 2>&1
 	mv sbcl.core-with-slime $@
 
 $(SBCL_PPC_CORE): $(SBCL_PPC)/bin/sbcl $(BOOTSTRAP_DEPS)
 	find slime site -name '*.fasl' -delete
 	rm -fr ~/.slime
-	SBCL_HOME=$(SBCL_PPC_LIB) $(SBCL_PPC)/bin/sbcl	\
-		--core $(SBCL_PPC_LIB)/sbcl.core	\
-		--load bootstrap.lisp > sbcl-ppc-core-log.txt 2>&1
+	SBCL_HOME=$(SBCL_PPC_LIB) $(SBCL_PPC)/bin/sbcl		\
+	    --core $(SBCL_PPC_LIB)/sbcl.core			\
+	    --load bootstrap.lisp > sbcl-ppc-core-log.txt 2>&1
 	mv sbcl.core-with-slime $@
 
 ######################################################################
@@ -197,20 +197,20 @@ SBCL_PPC_BOOTSTRAP_TBZ_URL = $(SBCL_DL_URL)/$(SBCL_PPC_BOOTSTRAP_TBZ)
 $(SBCL_I386)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
 	if [ -f $(LOCAL_CACHE)/$(SBCL_RUNTIME_TBZ) ]; then		\
-	  tar xjf $(LOCAL_CACHE)/$(SBCL_RUNTIME_TBZ);			\
-	  touch $@;							\
+	    tar xjf $(LOCAL_CACHE)/$(SBCL_RUNTIME_TBZ);			\
+	    touch $@;							\
 	else								\
-	  echo Building SBCL $(SBCL_VER) for i386, please wait ...;	\
-	  (cd sbcl && sh clean.sh &&					\
-	   SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib			\
-	   PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
-	   sh make.sh > sbcl-i386-log.txt 2>&1 &&			\
-	   (test ! -x "$(shell which latex)" ||				\
-	      (cd doc && sh make-doc.sh > sbcl-doc-log.txt 2>&1 &&	\
-	       cd manual && make > sbcl-manual-log.txt 2>&1 ));		\
-	   rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) &&		\
-	   INSTALL_ROOT=$(SBCL_I386)					\
-	   sh install.sh > sbcl-i386-install-log.txt 2>&1 );		\
+	    echo Building SBCL $(SBCL_VER) for i386, please wait ...;	\
+	    (cd sbcl && sh clean.sh &&					\
+	     SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib			\
+	     PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
+	     sh make.sh > sbcl-i386-log.txt 2>&1 &&			\
+	     (test ! -x "$(shell which latex)" ||			\
+	        (cd doc && sh make-doc.sh > sbcl-doc-log.txt 2>&1 &&	\
+	         cd manual && make > sbcl-manual-log.txt 2>&1 ));	\
+	     rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) &&		\
+	     INSTALL_ROOT=$(SBCL_I386)					\
+	     sh install.sh > sbcl-i386-install-log.txt 2>&1 );		\
 	fi
 
 $(SBCL_X86_64)/bin/sbcl: \
@@ -221,23 +221,23 @@ $(SBCL_X86_64)/bin/sbcl: \
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
 	 sh make.sh > sbcl-x86_64-log.txt 2>&1 &&			\
 	 rm -fr $(SBCL_X86_64) && mkdir -p $(SBCL_X86_64) &&		\
-	 INSTALL_ROOT=$(SBCL_X86_64) \
+	 INSTALL_ROOT=$(SBCL_X86_64)					\
 	 sh install.sh > sbcl-x86_64-install-log.txt 2>&1 )
 
 $(SBCL_PPC)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl
-	if [ -f $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) ]; then		\
-	  tar xjf $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ);		\
-	  touch $@;							\
-	else								\
-	  echo Building SBCL $(SBCL_VER) for powerpc, please wait ...;	\
-	  (cd sbcl && sh clean.sh &&					\
-	   SBCL_HOME=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/contrib		\
-	   PATH=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/src/runtime:$(PATH)	\
-	   sh make.sh > sbcl-ppc-log.txt 2>&1 &&			\
-	   rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) &&		\
-	   INSTALL_ROOT=$(SBCL_PPC)					\
-	   sh install.sh > sbcl-ppc-install-log.txt 2>&1 );		\
+	if [ -f $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) ]; then			\
+	    tar xjf $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ);			\
+	    touch $@;								\
+	else									\
+	    echo Building SBCL $(SBCL_VER) for powerpc, please wait ...;	\
+	    (cd sbcl && sh clean.sh &&						\
+	     SBCL_HOME=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/contrib			\
+	     PATH=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/src/runtime:$(PATH)		\
+	     sh make.sh > sbcl-ppc-log.txt 2>&1 &&				\
+	     rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) &&			\
+	     INSTALL_ROOT=$(SBCL_PPC)						\
+	     sh install.sh > sbcl-ppc-install-log.txt 2>&1 );			\
 	fi
 
 ######################################################################
@@ -417,26 +417,25 @@ else
 
 $(SBCL_PPC_RUNTIME_TBZ): $(SBCL_PPC_BOOTSTRAP_TBZ)
 	if [ -f $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) ]; then		\
-	  mv $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) $@;			\
-	  touch $@;							\
+	    mv $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) $@;		\
 	else								\
-	  ssh $(PPC_HOST) rm -fr /tmp/ready-lisp;			\
-	  rsync -e ssh -a --delete					\
-	      --exclude='*.o'						\
-	      --exclude='*.fasl'					\
-	      --exclude='/sbcl*-x86-darwin.bz2'				\
-	      --exclude=.git/						\
-	      --exclude=/image/						\
-	      --exclude=/build/						\
-	      --exclude=/dist/						\
-	      --exclude=/doc/						\
-	      --exclude=/sbcl/obj/					\
-	      --exclude=/sbcl/output/					\
-	      --exclude=/site-lisp/					\
-	      ./ $(PPC_HOST):/tmp/ready-lisp/;				\
-	  ssh $(PPC_HOST)						\
-	      "(cd /tmp/ready-lisp && make $(SBCL_PPC_RUNTIME_TBZ))";	\
-	  scp $(PPC_HOST):/tmp/ready-lisp/$@ .;				\
+	    ssh $(PPC_HOST) rm -fr /tmp/ready-lisp;			\
+	    rsync -e ssh -a --delete					\
+	        --exclude='*.o'						\
+	        --exclude='*.fasl'					\
+	        --exclude='/sbcl*-x86-darwin.bz2'			\
+	        --exclude=.git/						\
+	        --exclude=/image/					\
+	        --exclude=/build/					\
+	        --exclude=/dist/					\
+	        --exclude=/doc/						\
+	        --exclude=/sbcl/obj/					\
+	        --exclude=/sbcl/output/					\
+	        --exclude=/site-lisp/					\
+	        ./ $(PPC_HOST):/tmp/ready-lisp/;			\
+	    ssh $(PPC_HOST)						\
+	        "(cd /tmp/ready-lisp && make $(SBCL_PPC_RUNTIME_TBZ))";	\
+	    scp $(PPC_HOST):/tmp/ready-lisp/$@ .;			\
 	fi
 
 endif
