@@ -6,6 +6,12 @@ if [[ "$1" == "--local" ]]; then
     shift 1
 fi
 
+make=false
+if [[ "$1" == "--make" ]]; then
+    make=true
+    shift 1
+fi
+
 PPC_HOST=$1
 
 # Bootstrap a Ready Lisp disk image from complete scratch.  Just make sure all
@@ -14,13 +20,20 @@ PPC_HOST=$1
 
 HERE=$(pwd)
 
-if [ -d /tmp/ready-lisp ]; then
-    echo Removing previous ready-lisp build ...
-    rm -fr /tmp/ready-lisp
-fi
-
-if [[ -n "$PPC_HOST" ]]; then
-    ssh $PPC_HOST rm -fr /tmp/ready-lisp || exit 1
+if [[ -d /tmp/ready-lisp ]]; then
+    if [[ $make == true ]]; then
+	echo Updating changed files in temporary build tree ...
+	rsync -rlpgoDv		  \
+	    --exclude=.git/	  \
+	    --exclude='.git*'	  \
+	    --exclude='*.dmg'	  \
+	    --exclude='build.log' \
+	    --exclude='*.fasl'	  \
+	    ./ /tmp/ready-lisp/
+    else
+	echo Removing previous ready-lisp build ...
+	rm -fr /tmp/ready-lisp
+    fi
 fi
 
 cd /tmp
@@ -39,8 +52,13 @@ else
     cd ready-lisp && make || exit 1
 fi
 
+DISK_IMAGE=ReadyLisp-$(date +%Y%m%d).dmg
+
 echo Moving final disk image back to source tree ...
-mv build/ReadyLisp-*.dmg $HERE
+mv build/$DISK_IMAGE $HERE
+
+echo Zipping disk image to guard against improper MIME types on download ...
+zip -r $DISK_IMAGE.zip $DISK_IMAGE
 
 echo Ready Lisp build complete.
 
