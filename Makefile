@@ -180,6 +180,12 @@ $(SBCL_PPC_CORE): $(SBCL_PPC)/bin/sbcl $(BOOTSTRAP_DEPS)
 
 SBCL_DL_URL		   = http://prdownloads.sourceforge.net/sbcl
 
+SBCL_RUNTIME		   = sbcl-$(SBCL_VER)-x86-darwin
+SBCL_RUNTIME_TBZ	   = $(SBCL_RUNTIME)-build.tar.bz2
+
+SBCL_PPC_RUNTIME	   = sbcl-$(SBCL_VER)-powerpc-darwin
+SBCL_PPC_RUNTIME_TBZ	   = $(SBCL_PPC_RUNTIME)-build.tar.bz2
+
 SBCL_BOOTSTRAP		   = sbcl-$(SBCL_BOOTSTRAP_VER)-x86-darwin
 SBCL_BOOTSTRAP_TBZ	   = $(SBCL_BOOTSTRAP)-binary.tar.bz2
 SBCL_BOOTSTRAP_TBZ_URL	   = $(SBCL_DL_URL)/$(SBCL_BOOTSTRAP_TBZ)
@@ -190,21 +196,26 @@ SBCL_PPC_BOOTSTRAP_TBZ_URL = $(SBCL_DL_URL)/$(SBCL_PPC_BOOTSTRAP_TBZ)
 
 $(SBCL_I386)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
-	@echo Building SBCL $(SBCL_VER) for i386, please wait ...
-	(cd sbcl && sh clean.sh &&					\
-	 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib			\
-	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
-	 sh make.sh > sbcl-i386-log.txt 2>&1 &&				\
-	 (test ! -x "$(shell which latex)" ||				\
-	    (cd doc && sh make-doc.sh > sbcl-doc-log.txt 2>&1 &&	\
-	     cd manual && make > sbcl-manual-log.txt 2>&1 ));		\
-	 rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) &&		\
-	 INSTALL_ROOT=$(SBCL_I386)					\
-	 sh install.sh > sbcl-i386-install-log.txt 2>&1 )
+	if [ -f $(LOCAL_CACHE)/$(SBCL_RUNTIME_TBZ) ]; then		\
+	  tar xjf $(LOCAL_CACHE)/$(SBCL_RUNTIME_TBZ);			\
+	  touch $@;							\
+	else								\
+	  echo Building SBCL $(SBCL_VER) for i386, please wait ...;	\
+	  (cd sbcl && sh clean.sh &&					\
+	   SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib			\
+	   PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
+	   sh make.sh > sbcl-i386-log.txt 2>&1 &&			\
+	   (test ! -x "$(shell which latex)" ||				\
+	      (cd doc && sh make-doc.sh > sbcl-doc-log.txt 2>&1 &&	\
+	       cd manual && make > sbcl-manual-log.txt 2>&1 ));		\
+	   rm -fr $(SBCL_I386) && mkdir -p $(SBCL_I386) &&		\
+	   INSTALL_ROOT=$(SBCL_I386)					\
+	   sh install.sh > sbcl-i386-install-log.txt 2>&1 );		\
+	fi
 
 $(SBCL_X86_64)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_BOOTSTRAP)/src/runtime/sbcl
-	@echo Building SBCL $(SBCL_VER) for x86-64, please wait ...
+	echo Building SBCL $(SBCL_VER) for x86-64, please wait ...
 	(cd sbcl && sh clean.sh &&					\
 	 SBCL_ARCH=x86-64 SBCL_HOME=$(PWD)/$(SBCL_BOOTSTRAP)/contrib	\
 	 PATH=$(PWD)/$(SBCL_BOOTSTRAP)/src/runtime:$(PATH)		\
@@ -215,14 +226,19 @@ $(SBCL_X86_64)/bin/sbcl: \
 
 $(SBCL_PPC)/bin/sbcl: \
 	sbcl/version.lisp-expr $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl
-	@echo Building SBCL $(SBCL_VER) for powerpc, please wait ...
-	(cd sbcl && sh clean.sh &&				\
-	 SBCL_HOME=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/contrib		\
-	 PATH=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/src/runtime:$(PATH)	\
-	 sh make.sh > sbcl-ppc-log.txt 2>&1 &&			\
-	 rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) &&		\
-	 INSTALL_ROOT=$(SBCL_PPC) \
-	 sh install.sh > sbcl-ppc-install-log.txt 2>&1 )
+	if [ -f $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) ]; then		\
+	  tar xjf $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ);		\
+	  touch $@;							\
+	else								\
+	  echo Building SBCL $(SBCL_VER) for powerpc, please wait ...;	\
+	  (cd sbcl && sh clean.sh &&					\
+	   SBCL_HOME=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/contrib		\
+	   PATH=$(PWD)/$(SBCL_PPC_BOOTSTRAP)/src/runtime:$(PATH)	\
+	   sh make.sh > sbcl-ppc-log.txt 2>&1 &&			\
+	   rm -fr $(SBCL_PPC) && mkdir -p $(SBCL_PPC) &&		\
+	   INSTALL_ROOT=$(SBCL_PPC)					\
+	   sh install.sh > sbcl-ppc-install-log.txt 2>&1 );		\
+	fi
 
 ######################################################################
 
@@ -351,7 +367,6 @@ systems:
 ######################################################################
 
 PPC_HOST = none
-PPC_USER = johnw
 
 ReadyLisp/Contents/Resources/sbcl: build/sbcl/sbcl
 	rsync -a --exclude=share/ --exclude=bin/sbcl	\
@@ -387,36 +402,42 @@ endif
 
 ######################################################################
 
-$(SBCL_PPC): sbcl-$(SBCL_VER)-ppc.tar.bz2
-	if [   -f sbcl-$(SBCL_VER)-ppc.tar.bz2 -a		\
-	     ! -d $(SBCL_PPC) ]; then				\
-	    tar xjf sbcl-$(SBCL_VER)-ppc.tar.bz2;		\
+$(SBCL_PPC): $(SBCL_PPC_RUNTIME_TBZ)
+	if [   -f $(SBCL_PPC_RUNTIME_TBZ) -a	\
+	     ! -d $(SBCL_PPC) ]; then		\
+	    tar xjf $(SBCL_PPC_RUNTIME_TBZ);	\
 	fi
 
 ifeq ($(PPC_HOST),none)
 
-sbcl-$(SBCL_VER)-ppc.tar.bz2: $(SBCL_PPC_CORE)
+$(SBCL_PPC_RUNTIME_TBZ): $(SBCL_PPC_CORE)
 	tar cjf $@ build/sbcl/powerpc
 
 else
 
-sbcl-$(SBCL_VER)-ppc.tar.bz2: $(SBCL_PPC_BOOTSTRAP_TBZ)
-	rsync -e ssh -a --delete				\
-	    --exclude='*.o'					\
-	    --exclude='*.fasl'					\
-	    --exclude='/sbcl*-x86-darwin.bz2'			\
-	    --exclude=.git/					\
-	    --exclude=/image/					\
-	    --exclude=/build/					\
-	    --exclude=/dist/					\
-	    --exclude=/doc/					\
-	    --exclude=/sbcl/obj/				\
-	    --exclude=/sbcl/output/				\
-	    --exclude=/site-lisp/				\
-	    ./ $(PPC_USER)@$(PPC_HOST):/tmp/ready-lisp/
-	ssh $(PPC_USER)@$(PPC_HOST) \
-	    "(cd /tmp/ready-lisp && make sbcl-$(SBCL_VER)-ppc.tar.bz2)"
-	scp $(PPC_USER)@$(PPC_HOST):/tmp/ready-lisp/$@ .
+$(SBCL_PPC_RUNTIME_TBZ): $(SBCL_PPC_BOOTSTRAP_TBZ)
+	if [ -f $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) ]; then		\
+	  mv $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) $@;			\
+	  touch $@;							\
+	else								\
+	  ssh $(PPC_HOST) rm -fr /tmp/ready-lisp;			\
+	  rsync -e ssh -a --delete					\
+	      --exclude='*.o'						\
+	      --exclude='*.fasl'					\
+	      --exclude='/sbcl*-x86-darwin.bz2'				\
+	      --exclude=.git/						\
+	      --exclude=/image/						\
+	      --exclude=/build/						\
+	      --exclude=/dist/						\
+	      --exclude=/doc/						\
+	      --exclude=/sbcl/obj/					\
+	      --exclude=/sbcl/output/					\
+	      --exclude=/site-lisp/					\
+	      ./ $(PPC_HOST):/tmp/ready-lisp/;				\
+	  ssh $(PPC_HOST)						\
+	      "(cd /tmp/ready-lisp && make $(SBCL_PPC_RUNTIME_TBZ))";	\
+	  scp $(PPC_HOST):/tmp/ready-lisp/$@ .;				\
+	fi
 
 endif
 
