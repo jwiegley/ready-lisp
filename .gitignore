@@ -1,10 +1,13 @@
-*.elc
+*.asc
 *.dmg
 *.dmg.zip
-*.asc
+*.elc
+*.gz
+*.bz2
 .DS_Store
 /aquamacs
 /build
+/build.out
 /my-build.sh
 /out
 /site
