@@ -1,10 +1,25 @@
+* New in version 20090127
+
+** Fixed: The version number for SLIME should have been 2009-01-23, not
+   2009-01-25.
+
+** Fixed: The NEWS file was not updated for the last release.
+
+** Fixed: The distribution image contained an extraneous disk image of
+   Aquamacs.
+
+** Fixed: When starting up, the package :SWANK-PACKAGE-FU could not be found.
+
+** Fixed: Trying to locate symbols from SLIME resulted in an invalid path
+   error.
+
 * New in version 20090125
 
 ** Upgraded various components, the current versions are:
 
      Aquamacs    1.6
      SBCL        1.0.24
-     SLIME       2009-01-25
+     SLIME       2009-01-23
      CL-FAD      0.6.2
      CL-PPCRE    2.0.1
      LOCAL-TIME  0.9.3
