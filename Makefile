@@ -8,7 +8,7 @@ VERSION	    = $(shell date +%Y%m%d)
 ARCH	    = $(shell uname -p)
 PWD	    = $(shell pwd)
 LATEX       = $(shell which latex || echo none)
-LOCAL_CACHE = $(HOME)/Projects/ready-lisp/deps
+LOCAL_CACHE = deps
 
 ######################################################################
 
