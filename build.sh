@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TMPDIR=/tmp
+
 local=false
 if [[ "$1" == "--local" ]]; then
     local=true
@@ -20,36 +22,36 @@ PPC_HOST=$1
 
 HERE=$(pwd)
 
-if [[ -d /tmp/ready-lisp ]]; then
-    if [[ $make == true ]]; then
-	echo Updating changed files in temporary build tree ...
-	rsync -rlpgoDv		  \
-	    --exclude=.git/	  \
-	    --exclude='.git*'	  \
-	    --exclude='*.dmg'	  \
-	    --exclude='build.log' \
-	    --exclude='*.fasl'	  \
-	    ./ /tmp/ready-lisp/
-    else
+if [[ $make == true && -d $TMPDIR/ready-lisp ]]; then
+    echo Updating changed files in temporary build tree ...
+    rsync -rlpgoDv		  \
+	--exclude=.git/	  \
+	--exclude='.git*'	  \
+	--exclude='*.dmg'	  \
+	--exclude='build.log' \
+	--exclude='*.fasl'	  \
+	./ $TMPDIR/ready-lisp/
+else
+    if [[ -d $TMPDIR/ready-lisp ]]; then
 	echo Removing previous ready-lisp build ...
-	rm -fr /tmp/ready-lisp
+	rm -fr $TMPDIR/ready-lisp
+    fi
+
+    cd $TMPDIR
+
+    if [[ $local == true ]]; then
+	echo Copying source tree to $TMPDIR/ready-lisp ...
+	rsync -a ~/src/ready-lisp . || exit 1
+    else
+	echo Cloning ready-lisp from GitHub to $TMPDIR/ready-lisp ...
+	git clone git://github.com/jwiegley/ready-lisp.git || exit 1
     fi
 fi
 
-cd /tmp
-
-if [[ $local == true ]]; then
-    echo Copying source tree to /tmp/ready-lisp ...
-    rsync -a ~/src/ready-lisp . || exit 1
-else
-    echo Cloning ready-lisp from GitHub to /tmp/ready-lisp ...
-    git clone git://github.com/jwiegley/ready-lisp.git || exit 1
-fi
-
 if [[ -n "$PPC_HOST" ]]; then
-    cd ready-lisp && make PPC_HOST=$PPC_HOST || exit 1
+    cd $TMPDIR/ready-lisp && make PPC_HOST=$PPC_HOST || exit 1
 else
-    cd ready-lisp && make || exit 1
+    cd $TMPDIR/ready-lisp && make || exit 1
 fi
 
 DISK_IMAGE=ReadyLisp-$(date +%Y%m%d).dmg
