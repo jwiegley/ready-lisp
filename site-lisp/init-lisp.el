@@ -166,6 +166,13 @@
 
 (setenv "SBCL_HOME" *sbcl-lib-path*)
 
+(defvar *slime-source-path*
+  (expand-file-name "site-lisp/edit-modes/slime/" *ready-lisp-resources-path*))
+
+(defvar *slime-contrib-path*
+  (expand-file-name "site-lisp/edit-modes/slime/contrib/"
+		    *ready-lisp-resources-path*))
+
 ;; jww (2008-04-25): Ok, the following really needs some explanation; even if
 ;; you understand it perfectly (you nimble CL hacker you), I'm going to need
 ;; to remember what this does a few months or years from now...
@@ -240,26 +247,32 @@
 		 (cl:list
 		  (cl:pathname "SYS:CONTRIB;**;*.*.*")
 		  (cl:pathname ,(concat *sbcl-source-path* "/contrib/**/*.*")))))
-
-       (cl:maphash
-	(cl:lambda
-	 (key value)
-	 (cl:declare (cl:ignore key))
-	 (cl:let ((component
-		   (cl:car
-		    (cl:last (cl:pathname-directory
-			      (asdf::component-relative-pathname (cl:cdr value))))))
-		  (site-modules (quote ,(nthcdr 2 (directory-files *sbcl-site-path*)))))
-		 (cl:setf (cl:slot-value (cl:cdr value) 'asdf::relative-pathname)
-			  (cl:pathname
-			   (cl:concatenate
-			    'cl:string
-			    (cl:if (cl:member component site-modules
-					      :test (cl:symbol-function 'cl:string=))
-				   ,*sbcl-site-path*
-				   ,*sbcl-lib-path*)
-			    component "/")))))
-	asdf::*defined-systems*)))))
+       (cl:let
+	((sbcl-site-modules
+	  (quote ,(nthcdr 2 (directory-files *sbcl-site-path*)))))
+	(cl:maphash
+	 (cl:lambda
+	  (key value)
+	  (cl:declare (cl:ignore key))
+	  (cl:let
+	   ((component
+	     (cl:car
+	      (cl:last (cl:pathname-directory
+			(asdf::component-relative-pathname (cl:cdr value)))))))
+	   (cl:setf (cl:slot-value (cl:cdr value) 'asdf::relative-pathname)
+		    (cl:pathname
+		     (cl:concatenate
+		      'cl:string
+		      (cl:cond
+		       ((cl:member component sbcl-site-modules
+				   :test (cl:symbol-function 'cl:string=))
+			,*sbcl-site-path*)
+		       ((cl:string= component "slime")
+			,*slime-source-path*)
+		       (t
+			,*sbcl-lib-path*))
+		      component "/")))))
+	 asdf::*defined-systems*))))))
 
 (add-hook 'slime-connected-hook 'slime-reconfig-load-path)
 
