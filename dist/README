@@ -37,6 +37,7 @@ performed, to make sure that everything works together:
   - Test if M-. mapcar RET takes you to the source code
   - Test that the system runs successively on a PowerPC system
   - Test whether a new package can be installed using asdf-install
+  - Test running it on a virgin installation of Leopard
 
 -------------------------------------------------------------------------------
 
