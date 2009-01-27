@@ -133,8 +133,6 @@
    ;; slime-typeout-frame
    slime-xref-browser))
 
-;;(setq slime-net-coding-system 'utf-8-unix)
-
 (defvar *slime-use-intel-x86-64* nil)
 
 (defvar *sbcl-arch*
