@@ -1,0 +1,6 @@
+Populate this directory with the files from:
+
+  ftp://ftp.newartisans.com/pub/lisp/ready-lisp/deps
+
+UNIX users who have 'wget' installed can just simply run "sh download.sh" from
+within this directory.
