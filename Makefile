@@ -111,11 +111,13 @@ image/README: README NEWS
 	-mkdir image
 	cp -p README NEWS image
 	chflags hidden image/README image/NEWS
+	touch $@
 
 image/.background: dist/image.png dist/DS_Store
 	-mkdir image/.background
 	cp -p dist/image.png image/.background
 	cp -p dist/DS_Store image/.DS_Store
+	touch $@
 
 ######################################################################
 
@@ -261,7 +263,6 @@ sbcl/customize-target-features.lisp: customize-target-features.lisp
 $(SBCL_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_BOOTSTRAP_TBZ)
 	tar xjf $(SBCL_BOOTSTRAP_TBZ)
 	ln -f $(SBCL_BOOTSTRAP)/output/sbcl.core $(SBCL_BOOTSTRAP)/contrib
-	touch $@
 
 $(SBCL_BOOTSTRAP_TBZ):
 	if [ -f $(LOCAL_CACHE)/$(SBCL_BOOTSTRAP_TBZ) ]; then	\
@@ -273,7 +274,6 @@ $(SBCL_BOOTSTRAP_TBZ):
 $(SBCL_PPC_BOOTSTRAP)/src/runtime/sbcl: $(SBCL_PPC_BOOTSTRAP_TBZ)
 	tar xjf $(SBCL_PPC_BOOTSTRAP_TBZ)
 	ln -f $(SBCL_PPC_BOOTSTRAP)/output/sbcl.core $(SBCL_PPC_BOOTSTRAP)/contrib
-	touch $@
 
 $(SBCL_PPC_BOOTSTRAP_TBZ):
 	if [ -f $(LOCAL_CACHE)/$(SBCL_PPC_BOOTSTRAP_TBZ) ]; then	\
@@ -418,6 +418,7 @@ else
 $(SBCL_PPC_RUNTIME_TBZ): $(SBCL_PPC_BOOTSTRAP_TBZ)
 	if [ -f $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) ]; then		\
 	    mv $(LOCAL_CACHE)/$(SBCL_PPC_RUNTIME_TBZ) $@;		\
+	    touch $@;							\
 	else								\
 	    ssh $(PPC_HOST) rm -fr /tmp/ready-lisp;			\
 	    rsync -e ssh -a --delete					\
