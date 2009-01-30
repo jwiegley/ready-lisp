@@ -1,3 +1,9 @@
+* New in version 20090130
+
+** Updated: paredit.el and redshank.el.
+
+** Fixed: The core file for PowerPC machines was missing.
+
 * New in version 20090127
 
 ** Fixed: The version number for SLIME should have been 2009-01-23, not

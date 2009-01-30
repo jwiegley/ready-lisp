@@ -8,9 +8,9 @@ that's only a double-click away for Mac OS X users.
 
 This package includes the following code items:
 
- - Aquamacs 1.3b
- - SBCL (Steel Bank Common Lisp) 1.0.16
- - SLIME (Superior Lisp Interaction Mode for Emacs) CVS 2008-04-24
+ - Aquamacs 1.6
+ - SBCL (Steel Bank Common Lisp) 1.0.24
+ - SLIME (Superior Lisp Interaction Mode for Emacs) CVS 2008-01-23
  - paredit.el
  - redshank.el
  - cldoc.el
