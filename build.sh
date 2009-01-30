@@ -60,10 +60,7 @@ echo Moving final disk image back to source tree ...
 mv build/$DISK_IMAGE $HERE
 
 echo Zipping disk image to guard against improper MIME types on download ...
-zip -r $DISK_IMAGE.zip $DISK_IMAGE
-
-echo Moving final zipped disk image back to source tree ...
-mv $DISK_IMAGE.zip $HERE
+cd $HERE && zip -r $DISK_IMAGE.zip $DISK_IMAGE
 
 echo Ready Lisp build complete.
 
